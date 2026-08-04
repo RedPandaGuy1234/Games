@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: '18'
+
+    - name: Check for package.json
+      id: pkg
+      run: |
+        if [ -f package.json ]; then
+          echo "has_package=true" >> $GITHUB_OUTPUT
+        else
+          echo "has_package=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Install dependencies
+      if: steps.pkg.outputs.has_package == 'true'
+      run: npm install
+
+    - name: Run linter
+      if: steps.pkg.outputs.has_package == 'true'
+      run: npm run lint --if-present
+
+    - name: Run tests
+      if: steps.pkg.outputs.has_package == 'true'
+      run: npm test --if-present
+
+    - name: Build
+      if: steps.pkg.outputs.has_package == 'true'
+      run: npm run build --if-present
