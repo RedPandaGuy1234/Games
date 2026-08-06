@@ -12,7 +12,6 @@ col_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
 
 def check_coordinates_answer(Coordinate):
-    # Check if the column letter and row number are valid
     if Coordinate[0] in col_letters and Coordinate[1:].isdigit():
         
         column_number = col_letters.index(Coordinate[0])
