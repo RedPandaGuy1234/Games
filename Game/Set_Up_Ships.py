@@ -1,5 +1,7 @@
 import Locations
+
 Current_Coordinate = 0
+
 Patrol_Boat = [0, 0]
 Battleship = [0, 0, 0, 0]
 Destroyer = [0, 0, 0]
@@ -8,11 +10,19 @@ Carrier = [0, 0, 0, 0, 0]
 
 col_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
+
 def check_coordinates_answer(Coordinate):
+    # Check if the column letter and row number are valid
     if Coordinate[0] in col_letters and Coordinate[1:].isdigit():
-        return True
+        
+        column_number = col_letters.index(Coordinate[0])
+        
+        row_number = int(Coordinate[1:])
+        
+        return (column_number, row_number)
+    
     else:
-        return False
+        return None
 
 
 Current_Coordinate = input(
@@ -20,8 +30,13 @@ Current_Coordinate = input(
     "Each coordinate starts with A to J (please use uppercase), then 1 to 10 with no spaces: "
 )
 
-if check_coordinates_answer(Current_Coordinate):
+
+converted_coordinate = check_coordinates_answer(Current_Coordinate)
+
+
+if converted_coordinate:
     print("Valid coordinate!")
-    Patrol_Boat[0] = Current_Coordinate
+    Patrol_Boat[0] = converted_coordinate
+
 else:
     print("Invalid coordinate!")
