@@ -4,3 +4,5 @@ Battleship = 0
 Destroyer = 0
 Sumbarine = 0
 Carrier = 0
+
+Patrol_Boat = input(
