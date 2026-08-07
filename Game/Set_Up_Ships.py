@@ -18,8 +18,6 @@ def check_coordinates_answer(Coordinate):
         return (column_number, row_number)
     else:
         return None
-#This is a test line below, and will be deleted.
-print(Patrol_Boat[0])
 
 Current_Coordinate = input(
     "Let's get started! What is the first coordinate you want your patrol boat (2 squares)? "
