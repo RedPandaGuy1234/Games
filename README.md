@@ -2,7 +2,7 @@
 
 A classic Battleship game implemented in Python.
 
-This repository contains a Python implementation of the Battleship board game. The game can be played locally (command-line) and includes AI and/or local multiplayer support. This README is a template — replace or update any placeholders below to match the actual project files and behavior.
+This repository contains a Python implementation of the Battleship board game. The game can be played locally (in your terminal) and includes AI and/or local multiplayer support. This README is a template — replace or update any placeholders below to match the actual project files and behavior.
 
 ## Table of Contents
 - [Features](#features)
@@ -66,27 +66,6 @@ Replace or remove options depending on your implementation.
   - The game reports Hit, Miss, or Sunk and updates the boards.
 - Win condition: sink all opponent ships.
 
-## Project structure (example)
-Update these to reflect the actual repository layout.
-- battleship/         — package code
-  - __init__.py
-  - game.py            — main game logic
-  - board.py           — board and ship classes
-  - ai.py              — AI opponent logic
-  - cli.py             — command-line interface
-- tests/               — unit tests
-- requirements.txt
-- README.md
-
-## Development & Testing
-Run unit tests with pytest (if tests are included):
-pip install -r requirements-dev.txt  # if you have dev requirements
-pytest
-
-Static analysis / formatting suggestions:
-- black .       # formatting
-- flake8 .      # linting
-
 ## Contributing
 Contributions are welcome. Suggested workflow:
 1. Fork the repo
@@ -97,8 +76,8 @@ Contributions are welcome. Suggested workflow:
 Please include tests for new features or bug fixes and follow existing code style.
 
 ## License
-This project is released under the MIT License. See LICENSE for details (or replace with your preferred license).
+This project is released under the GPL -3.0 License. See LICENSE for details.
 
 ## Contact
 Maintainer: RedPandaGuy1234
-GitHub: https://github.com/RedPandaGuy1234/Battleship
+GitHub: https://github.com/RedPandaGuy1234
