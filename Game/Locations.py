@@ -6,7 +6,7 @@ def import_ships():
 def put_in_ship_data(ship, num, ship_name):
     #This will be replaced with actual code.
 
-A_file = ["Nothing"] * 10
+    A_file = ["Nothing"] * 10
 B_file = ["Nothing"] * 10
 C_file = ["Nothing"] * 10
 D_file = ["Nothing"] * 10
