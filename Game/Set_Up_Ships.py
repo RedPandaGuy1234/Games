@@ -12,7 +12,6 @@ col_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
 
 def check_coordinates_answer(Coordinate):
-    # Basic validation: must be at least 2 characters (e.g. A1) with letter then digits
     if isinstance(Coordinate, str) and len(Coordinate) >= 2 and Coordinate[0] in col_letters and Coordinate[1:].isdigit():
         column_number = col_letters.index(Coordinate[0])
         row_number = int(Coordinate[1:])
