@@ -1,7 +1,8 @@
 def import_ships():
   import Set_Up_Ships
 
-def put_in_ship_data(ship, num)
+def put_in_ship_data(ship, num, ship_name)
+  
   
 
 A_file = ["Nothing", "Nothing", "Nothing", "Nothing," "Nothing", "Nothing", "Nothing", "Nothing", "Nothing", "Nothing"]
