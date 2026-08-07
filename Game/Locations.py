@@ -1,3 +1,6 @@
+def import():
+  import Set_Up_Ships
+
 A_file = ["Nothing", "Nothing", "Nothing", "Nothing," "Nothing", "Nothing", "Nothing", "Nothing", "Nothing", "Nothing"]
 B_file = ["Nothing", "Nothing", "Nothing", "Nothing," "Nothing", "Nothing", "Nothing", "Nothing", "Nothing", "Nothing"]
 C_file = ["Nothing", "Nothing", "Nothing", "Nothing," "Nothing", "Nothing", "Nothing", "Nothing", "Nothing", "Nothing"]
