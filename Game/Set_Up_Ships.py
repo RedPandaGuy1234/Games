@@ -34,7 +34,7 @@ converted_coordinate = check_coordinates_answer(Current_Coordinate)
 
 
 if converted_coordinate:
-    print("Valid coordinate!")
+    print("Coordinate will be added!")
     Patrol_Boat[0] = converted_coordinate
 
 else:
