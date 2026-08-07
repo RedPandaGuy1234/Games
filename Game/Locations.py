@@ -1,4 +1,4 @@
-def import():
+def change_locations_for_ships():
   import Set_Up_Ships
 
 A_file = ["Nothing", "Nothing", "Nothing", "Nothing," "Nothing", "Nothing", "Nothing", "Nothing", "Nothing", "Nothing"]
