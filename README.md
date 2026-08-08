@@ -17,8 +17,8 @@ This repository contains a Python implementation of the Battleship board game. T
 ## Features
 - Classic Battleship gameplay (place ships, call shots, sink enemy fleet)
 - Single-player mode vs. computer AI
-- Two-player local mode (hotseat)
-- Clean CLI interface with coordinate input (e.g., A5)
+- Two-player local mode
+- Clean interface with coordinate input (e.g., A5)
 
 ## Requirements
 - Python 3 or newer
