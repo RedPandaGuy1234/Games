@@ -22,6 +22,7 @@ This repository contains a Python implementation of the Battleship board game. T
 
 ## Requirements
 - Python 3 or newer
+- A terminal
 
 ## Installation
 1. Clone the repository
