@@ -1,0 +1,3 @@
+Games:
+  any-glob-to-any-file: 
+  - "Game/*"
