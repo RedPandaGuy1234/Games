@@ -48,9 +48,8 @@ python3 Set_Up_Ships.py
 ## Contributing
 Contributions are welcome. Suggested workflow:
 1. Fork the repo
-2. Create a feature branch: git checkout -b feature/your-feature
-3. Commit changes and push
-4. Open a pull request
+2. Commit changes to fork
+3. Open a pull request
 
 Please include tests for new features or bug fixes and follow existing code style.
 
