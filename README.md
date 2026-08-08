@@ -31,7 +31,6 @@ This repository contains a Python implementation of the Battleship board game. T
    cd Battleship
 
 ## Usage
-Adjust the command below to match your project's entry point (for example `main.py`, `run.py`, or a module).
 
 Run the game:
 python3 Set_Up_Ships.py
@@ -40,9 +39,9 @@ python3 Set_Up_Ships.py
 - Board coordinates use letters for rows and numbers for columns (e.g., A1, B7).
 - Ship placement:
   - Place ships manually or let the AI place them automatically.
-  - Common ship sizes: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).
+  - Ship sizes: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (3), and Patrol Boat (2).
 - Taking a turn:
-  - Enter the coordinate to fire at (e.g., `E4`).
+  - Enter the coordinate to fire at (e.g., E4).
   - The game reports Hit, Miss, or Sunk and updates the boards.
 - Win condition: sink all opponent ships.
 
