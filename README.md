@@ -11,7 +11,6 @@ This repository contains a Python implementation of the Battleship board game. T
 - [Usage](#usage)
 - [Gameplay](#gameplay)
 - [Project structure](#project-structure)
-- [Development & Testing](#development--testing)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
