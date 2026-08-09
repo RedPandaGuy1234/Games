@@ -1,3 +1,7 @@
 Games:
   any-glob-to-any-file: 
-  - "Game/*"
+  - "Game"
+
+Github:
+    any-glob-to-file:
+    - ".Github"
