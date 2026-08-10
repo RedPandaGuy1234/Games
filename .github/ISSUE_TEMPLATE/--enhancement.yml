@@ -1,4 +1,4 @@
-name: Enhancement
+name Enhancement
 description: Suggest an improvement to existing functionality!
 labels: ["type: enhancement"]
 body:
