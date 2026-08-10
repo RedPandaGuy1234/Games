@@ -2,7 +2,7 @@
 
 A classic Battleship game implemented in Python.
 
-This repository contains a Python implementation of the Battleship board game. The game can be played locally (in your terminal) and includes AI and/or local multiplayer support.
+This repository contains a Python implementation of the Battleship board game. The game can be played locally (in your terminal) and includes a bot and local multiplayer support.
 
 ## Table of Contents
 - [Features](#features)
