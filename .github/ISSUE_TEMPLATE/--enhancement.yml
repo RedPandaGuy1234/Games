@@ -1,19 +1,19 @@
-name Enhancement
-description Suggest an improvement to existing functionality!
-labels ["type enhancement"]
-body
-   type markdown
-    attributes
-      value |
+name: Enhancement
+description: Suggest an improvement to existing functionality!
+labels: ["type: enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
         ### Read before creating!
 
         - Avoid creating duplicates! Search through issues and discussions before creating one.
         - Try to make a simple but descriptive title, and explain what the enhancement is.
 
-  - type textarea
-    id current_behavior
-    attributes
-      label Current behavior
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current behavior
       description: Describe how the feature currently works.
       placeholder: Currently, the feature does...
     validations:
@@ -22,13 +22,13 @@ body
   - type: markdown
     attributes:
       value: |
-        - Can you create this yourself?
+        - Can you implement this yourself?
 
   - type: textarea
-    id: current_behavior
+    id: can_you_create
     attributes:
-    label: 
-    description: Answer yes, no, or maybe.
-    placeholder: 
-  validations:
-    required: false
+      label: Can you create this yourself?
+      description: Answer yes, no, or maybe. If yes, provide details or a PR link.
+      placeholder: yes / no / maybe
+    validations:
+      required: false
