@@ -18,3 +18,17 @@ body:
       placeholder: Currently, the feature does...
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        - Can you create this yourself?
+
+  - type: textarea
+    id: current_behavior
+    attributes:
+    label: 
+    description: Answer yes, no, or maybe.
+    placeholder: 
+  validations:
+    required: false
