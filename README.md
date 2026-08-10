@@ -32,6 +32,9 @@ This repository contains a Python implementation of the Battleship board game. T
 
 ## Usage
 
+Go into the file for the game:
+``cd Game``
+
 Run the game:
 ``python3 Set_Up_Ships.py``
 
