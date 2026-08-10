@@ -1,0 +1,44 @@
+name: ✨ Feature
+description: Suggest a feature or improvement!
+type: Enhancement
+labels: ["status: needs triage", "type: enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Read before creating!
+
+        - Avoid creating duplicates! Search through issues and discussions before creating one.
+        - Try to make a simple but descriptive title, and include the detailed information below.
+        - For help, open a [discussion](https://github.com/RedPandaGuy1234/Battleship/discussions).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Why this would be helpful
+      description: How would this help with a problem or make something better?
+      placeholder: Currently, I can only do X. It would be great if I could also...
+    validations:
+      required: true
+
+  - type: textarea
+    id: howitworks
+    attributes:
+      label: My suggestion
+      description: Describe the changes you're suggesting and how they work.
+      placeholder: Add a feature to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Possible alternatives
+      description: Any alternative solutions or features you've thought about?
+      placeholder: We could also ... instead.
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Add any other information like screenshots, code examples, or context about the feature request here.
