@@ -1,7 +1,7 @@
 name Enhancement
 description Suggest an improvement to existing functionality!
-labels: ["type: enhancement"]
-body:
+labels ["type: enhancement"]
+body
    type markdown
     attributes
       value |
@@ -10,10 +10,10 @@ body:
         - Avoid creating duplicates! Search through issues and discussions before creating one.
         - Try to make a simple but descriptive title, and explain what the enhancement is.
 
-  - type: textarea
-    id: current_behavior
-    attributes:
-      label: Current behavior
+  - type textarea
+    id current_behavior
+    attributes
+      label Current behavior
       description: Describe how the feature currently works.
       placeholder: Currently, the feature does...
     validations:
