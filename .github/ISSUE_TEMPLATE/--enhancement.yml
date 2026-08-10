@@ -2,7 +2,7 @@ name: Enhancement
 description: Suggest an improvement to existing functionality!
 labels: ["type: enhancement"]
 body:
-  - type: markdown
+   type: markdown
     attributes:
       value: |
         ### Read before creating!
