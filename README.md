@@ -28,7 +28,7 @@ This repository contains a Python implementation of the Battleship board game. T
 1. Clone the repository:
    ``git clone https://github.com/RedPandaGuy1234/Battleship``
 2. Enter the project directory
-   cd Battleship
+   ``cd Battleship``
 
 ## Usage
 
