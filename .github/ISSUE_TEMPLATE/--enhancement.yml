@@ -17,7 +17,7 @@ body:
       description: Describe how the feature currently works.
       placeholder: Currently, the feature does...
     validations:
-      required: true
+      required: false
 
   - type: markdown
     attributes:
