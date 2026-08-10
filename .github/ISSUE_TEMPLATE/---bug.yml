@@ -20,10 +20,18 @@ body:
         **Screenshots**
         If applicable, add screenshots to help explain your problem.
 
-        **Desktop (please complete the following information):**
-        - OS: [e.g. Windows 10]
-        - Browser: [e.g. Chrome 92]
-        - Version: [e.g. 1.2.3]
+  - type: textarea
+    id: environment
+    attributes:
+      label: Desktop / Environment
+      description: Provide OS, browser and version (if applicable).
+      placeholder: |
+        OS: [e.g. Windows 10]
+        Browser: [e.g. Chrome 92]
+        Version: [e.g. 1.2.3]
 
-        **Additional context**
-        Add any other context about the problem here.
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.
