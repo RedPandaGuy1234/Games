@@ -4,7 +4,7 @@ labels: ["type: enhancement"]
 body:
    type: markdown
     attributes
-      value: |
+      value |
         ### Read before creating!
 
         - Avoid creating duplicates! Search through issues and discussions before creating one.
