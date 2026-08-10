@@ -1,0 +1,44 @@
+name: 🚀 Enhancement
+description: Suggest an improvement to existing functionality!
+type: Enhancement
+labels: ["status: needs triage", "type: enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Read before creating!
+
+        - Avoid creating duplicates! Search through issues and discussions before creating one.
+        - Try to make a simple but descriptive title, and include the detailed information below.
+        - For help, open a [discussion](https://github.com/RedPandaGuy1234/Battleship/discussions).
+
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current behavior
+      description: Describe how the feature currently works.
+      placeholder: Currently, the feature does...
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired_behavior
+    attributes:
+      label: Desired behavior
+      description: Describe how you'd like it to work instead.
+      placeholder: It would be better if it could...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Possible alternatives
+      description: Any alternative approaches you've considered?
+      placeholder: Another way could be...
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Add any other information like screenshots or code examples.
