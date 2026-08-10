@@ -1,6 +1,5 @@
-name: Feature
+name: "✨ Feature"
 description: Suggest a feature or improvement!
-type: Enhancement
 labels: ["status: needs triage", "type: enhancement"]
 body:
   - type: markdown
