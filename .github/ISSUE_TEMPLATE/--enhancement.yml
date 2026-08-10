@@ -11,6 +11,15 @@ body:
         - Try to make a simple but descriptive title, and explain what the enhancement is.
 
   - type: textarea
+    id: enhancement_description
+    attributes:
+      label: Enhancement description
+      description: Describe what the enhancement is and how it would improve the functionality.
+      placeholder: The enhancement would...
+    validations:
+      required: true
+
+  - type: textarea
     id: current_behavior
     attributes:
       label: Current behavior
