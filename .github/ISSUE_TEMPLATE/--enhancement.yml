@@ -40,4 +40,4 @@ body:
       description: Answer yes, no, or maybe. If yes, provide details or a PR link.
       placeholder: Yes / No / Maybe
     validations:
-      required: false
+      required: true
