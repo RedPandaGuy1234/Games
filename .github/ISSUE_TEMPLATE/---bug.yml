@@ -1,57 +1,7 @@
-name: 🐛 Bug
+name: Bug
 description: Report a bug.
-labels: ["status: needs triage", "type: bug"]
+labels: ["type: bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        ### Read before creating!
-
-        - Avoid creating duplicates! Search through issues and discussions before creating one.
-        - Try to make a simple but descriptive title, and include the detailed information below. This could save a lot of time and help us fix issues swiftly.
-        - For help, open a [discussion](https://github.com/RedPandaGuy1234/Battleship/discussions).
-        - If you found a security vulnerability, please read our [security policy](https://github.com/RedPandaGuy1234/Battleship/security/policy).
-
-  - type: textarea
-    id: description
-    attributes:
-      label: Description
-      description: Include a clear and concise description of what should happen and what's actually happening.
-      placeholder: When I do X, Y happens instead of Z...
-    validations:
-      required: true
-
-  - type: textarea
-    id: repro
-    attributes:
-      label: Steps to reproduce
-      description: Provide an unambiguous set of steps to reproduce this bug.
-      placeholder: |
-        1. Run the program with...
-        2. Enter...
-        3. Observe...
-      value: |
-        1.
-        2.
-        3.
-    validations:
-      required: true
-
-  - type: textarea
-    id: additionalcontext
-    attributes:
-      label: Demonstration(s) and additional context
-      description: If applicable, insert screenshots or a code example to help demonstrate your problem, as well as any other useful information here.
-
-  - type: textarea
-    id: environment
-    attributes:
-      label: Environment
-      description: Include information related to your environment/device.
-      placeholder: Include your Python version, operating system, and any relevant dependencies.
-      value: |
-        Python version: <!-- e.g. 3.9 -->
-        Operating system: <!-- e.g. Windows, macOS, Linux -->
-        Other relevant info: 
-    validations:
-      required: true
