@@ -3,7 +3,7 @@ description: Suggest an improvement to existing functionality!
 labels: ["type: enhancement"]
 body:
    type: markdown
-    attributes:
+    attributes
       value: |
         ### Read before creating!
 
