@@ -9,7 +9,6 @@ body:
 
         - Avoid creating duplicates! Search through issues and discussions before creating one.
         - Try to make a simple but descriptive title, and include the detailed information below.
-        - For help, open a [discussion](https://github.com/RedPandaGuy1234/Battleship/discussions).
 
   - type: textarea
     id: problem
@@ -18,7 +17,7 @@ body:
       description: How would this help with a problem or make something better?
       placeholder: Currently, I can only do X. It would be great if I could also...
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: howitworks
@@ -27,7 +26,7 @@ body:
       description: Describe the changes you're suggesting and how they work.
       placeholder: Add a feature to...
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: alternatives
