@@ -29,6 +29,6 @@ body:
     attributes:
       label: Can you create this yourself?
       description: Answer yes, no, or maybe. If yes, provide details or a PR link.
-      placeholder: yes / no / maybe
+      placeholder: Yes / No / Maybe
     validations:
       required: false
