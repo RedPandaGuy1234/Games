@@ -2,9 +2,12 @@ name: Bug
 description: Report a bug.
 labels: ["type: bug"]
 body:
-  - type: markdown
+  - type: textarea
+    id: description
     attributes:
-      value: |
+      label: Bug description
+      description: A clear and concise description of what the bug is, including steps to reproduce, expected behavior, and screenshots if applicable.
+      placeholder: |
         **Describe the bug**
         A clear and concise description of what the bug is.
 
