@@ -7,7 +7,7 @@ Battleship = [0, 0, 0, 0]
 Destroyer = [0, 0, 0]
 Submarine = [0, 0, 0]
 Carrier = [0, 0, 0, 0, 0]
-is_coordinate_correct = false
+is_coordinate_correct = False
 
 col_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
@@ -42,4 +42,4 @@ else:
         if converted_coordinate:
             print("The coordinate is now correct!")
             Patrol_Boat[0] = converted_coordinate
-            is_coordinate_correct = true
+            is_coordinate_correct = True
