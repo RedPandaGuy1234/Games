@@ -7,12 +7,15 @@ Battleship = [0, 0, 0, 0]
 Destroyer = [0, 0, 0]
 Submarine = [0, 0, 0]
 Carrier = [0, 0, 0, 0, 0]
+is_coordinate_correct = false
 
 col_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
 
 def check_coordinates_answer(Coordinate):
-    if isinstance(Coordinate, str) and len(Coordinate) >= 2 and Coordinate[0] in col_letters and Coordinate[1:].isdigit():
+    if (isinstance(Coordinate, str) and len(Coordinate) >= 2 
+            and Coordinate[0] in col_letters and Coordinate[1:].isdigit()
+            and 1 <= int(Coordinate[1:]) <= 10):
         column_number = col_letters.index(Coordinate[0])
         row_number = int(Coordinate[1:])
         return (column_number, row_number)
@@ -33,4 +36,10 @@ if converted_coordinate:
     Patrol_Boat[0] = converted_coordinate
 
 else:
-    print("Invalid coordinate!")
+    while not is_coordinate_correct:
+        Current_Coordinate = input("Invalid coordinate! Remember; the coordinate must have the first part being a letter from A to J, and the second part being 1 to 10.")
+        converted_coordinate = check_coordinates_answer(Current_Coordinate)
+        if converted_coordinate:
+            print("The coordinate is now correct!")
+            Patrol_Boat[0] = converted_coordinate
+            is_coordinate_correct = true
