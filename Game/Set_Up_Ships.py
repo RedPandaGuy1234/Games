@@ -12,7 +12,7 @@ is_coordinate_correct = False
 
 col_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
-def make_sure_coordinate_is_correct(ship, num):
+def make_sure_coordinate_is_correct(ship, num, coordinate_num):
     global is_coordinate_correct
     while not is_coordinate_correct:
         Current_Coordinate = input("Invalid coordinate! Remember; the coordinate must have the first part being a letter from A to J, and the second part being 1 to 10. Please re-enter the coordinate.")
@@ -20,6 +20,7 @@ def make_sure_coordinate_is_correct(ship, num):
         if converted_coordinate:
             print("The coordinate is now correct!")
             ship[num] = converted_coordinate
+            Used_Coordinates[coordinate_num] = converted_coordinate
             is_coordinate_correct = True
 
 
@@ -46,6 +47,7 @@ converted_coordinate = check_coordinates_answer(Current_Coordinate)
 if converted_coordinate:
     print("Coordinate will be added!")
     Patrol_Boat[0] = converted_coordinate
+    Used_Coordinates[0] = converted_coordinate
 
 else:
     make_sure_coordinate_is_correct(Patrol_Boat, 0)
