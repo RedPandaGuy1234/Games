@@ -23,14 +23,20 @@ def make_sure_coordinate_is_correct(ship, num, coordinate_num):
             is_coordinate_correct = True
 
 
-
 def check_coordinates_answer(Coordinate):
     if (isinstance(Coordinate, str) and len(Coordinate) >= 2 
             and Coordinate[0] in col_letters and Coordinate[1:].isdigit()
-            and 1 <= int(Coordinate[1:]) <= 10)
+            and 1 <= int(Coordinate[1:]) <= 10):
         column_number = col_letters.index(Coordinate[0])
         row_number = int(Coordinate[1:])
-        return (column_number, row_number)
+        new_coordinate = (column_number, row_number)
+        
+        for existing in Used_Coordinates:
+            if existing != 0 and existing == new_coordinate:
+                print("That coordinate is already taken! Please choose another.")
+                return None
+        
+        return new_coordinate
     else:
         return None
 
