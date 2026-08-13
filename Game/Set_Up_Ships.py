@@ -61,4 +61,4 @@ Current_Coordinate = input("Okay, you now know how to do this! Now, let's do thi
 converted_coordinate = check_coordinates_answer(Current_Coordinate)
 
 if converted_coordinate:
-        print("This is another correct coordinate
+        print("This is another correct coordinate! Let's keep going through the coordinates.")
