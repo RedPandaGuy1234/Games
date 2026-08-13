@@ -64,3 +64,5 @@ if converted_coordinate:
     print("This is another correct coordinate! Let's keep going through the coordinates.")
     Patrol_Boat[1] = converted_coordinate
     Used_Coordinates[1] = converted_coordinate    
+else: 
+    make_sure_coordinate_is_correct(Patrol_Boat, 1, 1)
