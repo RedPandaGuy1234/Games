@@ -66,3 +66,5 @@ if converted_coordinate:
     Used_Coordinates[1] = converted_coordinate    
 else: 
     make_sure_coordinate_is_correct(Patrol_Boat, 1, 1)
+    Patrol_Boat[1] = converted_coordinate
+    Used_Coordinates[1] = converted_coordinate
