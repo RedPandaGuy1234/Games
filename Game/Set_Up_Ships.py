@@ -50,4 +50,3 @@ if converted_coordinate:
 
 else:
     make_sure_coordinate_is_correct(Patrol_Boat, 0, 0)
-is_coordinate_correct = False
