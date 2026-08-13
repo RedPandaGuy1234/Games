@@ -11,7 +11,7 @@ is_coordinate_correct = False
 
 col_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
-def make_sure_coordinate_is_correct(Current_Coordinate, converted_coordinate, ship, num, is_coordinate_correct)
+def make_sure_coordinate_is_correct(Current_Coordinate, converted_coordinate, ship, num, is_coordinate_correct):
     while not is_coordinate_correct:
         Current_Coordinate = input("Invalid coordinate! Remember; the coordinate must have the first part being a letter from A to J, and the second part being 1 to 10. Please re-enter the coordinate.")
         converted_coordinate = check_coordinates_answer(Current_Coordinate)
