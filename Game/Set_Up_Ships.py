@@ -7,6 +7,7 @@ Battleship = [0, 0, 0, 0]
 Destroyer = [0, 0, 0]
 Submarine = [0, 0, 0]
 Carrier = [0, 0, 0, 0, 0]
+Used_Coordinates = [0] * 17
 is_coordinate_correct = False
 
 col_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
