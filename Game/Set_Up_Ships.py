@@ -23,19 +23,28 @@ def make_sure_coordinate_is_correct(ship, num, coordinate_num):
             is_coordinate_correct = True
 
 
-def check_coordinates_answer(Coordinate):
+def check_coordinates_answer(Coordinate, ship=None, is_first_coordinate=True):
     if (isinstance(Coordinate, str) and len(Coordinate) >= 2 
             and Coordinate[0] in col_letters and Coordinate[1:].isdigit()
             and 1 <= int(Coordinate[1:]) <= 10):
         column_number = col_letters.index(Coordinate[0])
         row_number = int(Coordinate[1:])
         new_coordinate = (column_number, row_number)
-        
+
         for existing in Used_Coordinates:
             if existing != 0 and existing == new_coordinate:
                 print("That coordinate is already taken! Please choose another.")
                 return None
-        
+                
+        if not is_first_coordinate and ship is not None:
+            first_coordinate = ship[0]
+            if first_coordinate != 0:
+                same_column = new_coordinate[0] == first_coordinate[0]
+                same_row = new_coordinate[1] == first_coordinate[1]
+                if not (same_column or same_row):
+                    print("That coordinate must share a row or column with the ship's first coordinate!")
+                    return None
+
         return new_coordinate
     else:
         return None
@@ -46,7 +55,7 @@ Current_Coordinate = input(
 )
 
 
-converted_coordinate = check_coordinates_answer(Current_Coordinate)
+converted_coordinate = check_coordinates_answer(Current_Coordinate, Patrol_Boat, True)
 
 
 if converted_coordinate:
@@ -59,7 +68,7 @@ else:
     make_sure_coordinate_is_correct(Patrol_Boat, 0, 0)
 
 Current_Coordinate = input("Okay, you now know how to do this! Now, let's do this with the other coordinate in the patrol boat. Please enter it.")
-converted_coordinate = check_coordinates_answer(Current_Coordinate)
+converted_coordinate = check_coordinates_answer(Current_Coordinate, Patrol_Boat, True)
 
 if converted_coordinate:
     print("This is another correct coordinate! Let's keep going through the coordinates.")
