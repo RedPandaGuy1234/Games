@@ -4,9 +4,10 @@ def import_ships():
 
 
 def put_in_ship_data(ship_letter, ship_num, ship_name, num_of_coordinates):
-    
+    pass
 
-    A_file = ["Nothing"] * 10
+
+A_file = ["Nothing"] * 10
 B_file = ["Nothing"] * 10
 C_file = ["Nothing"] * 10
 D_file = ["Nothing"] * 10
