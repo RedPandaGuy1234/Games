@@ -53,6 +53,7 @@ if converted_coordinate:
     print("Coordinate will be added!")
     Patrol_Boat[0] = converted_coordinate
     Used_Coordinates[0] = converted_coordinate
+    print(Patrol_Boat[0])
 
 else:
     make_sure_coordinate_is_correct(Patrol_Boat, 0, 0)
