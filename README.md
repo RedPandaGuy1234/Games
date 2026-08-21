@@ -26,17 +26,17 @@ This repository contains a Python implementation of the Battleship board game. T
 
 ## Installation
 1. Clone the repository:
-   ``git clone https://github.com/RedPandaGuy1234/Battleship``
+   `git clone https://github.com/RedPandaGuy1234/Battleship`
 2. Enter the project directory
-   ``cd Battleship``
+   `cd Battleship`
 
 ## Usage
 
 Go into the file for the game:
-``cd Game``
+`cd Game`
 
 Run the game:
-``python3 Set_Up_Ships.py``
+`python3 Set_Up_Ships.py`
 
 ## Gameplay
 - Board coordinates use letters for rows and numbers for columns (e.g., A1, B7).
@@ -57,7 +57,7 @@ Contributions are welcome. Suggested workflow:
 Please include tests for new features or bug fixes and follow existing code style.
 
 ## License
-This project is released under the GPL -3.0 License. See LICENSE for details.
+This project is released under the GPL-3.0 License. See LICENSE for details.
 
 ## Contact
 Maintainer: RedPandaGuy1234
