@@ -1,0 +1,83 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get the diff
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git diff origin/${{ github.event.pull_request.base.ref }}...HEAD > pr.diff
+          echo "Diff has $(wc -l < pr.diff) lines"
+
+      - name: Ask Claude to review the diff
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, urllib.request
+
+          with open("pr.diff") as f:
+              diff = f.read()
+
+          max_chars = 60000
+          if len(diff) > max_chars:
+              diff = diff[:max_chars] + "\n\n...(diff truncated, too large)..."
+
+          prompt = (
+              "Review this pull request diff for a beginner Python project. "
+              "Point out bugs, edge cases, and style issues, referencing file "
+              "names and line numbers where possible. Be concise. If it looks "
+              "fine, say so briefly.\n\n"
+              f"```diff\n{diff}\n```"
+          )
+
+          body = json.dumps({
+              "model": "claude-sonnet-5",
+              "max_tokens": 1500,
+              "messages": [{"role": "user", "content": prompt}]
+          }).encode()
+
+          req = urllib.request.Request(
+              "https://api.anthropic.com/v1/messages",
+              data=body,
+              headers={
+                  "Content-Type": "application/json",
+                  "x-api-key": os.environ["ANTHROPIC_API_KEY"],
+                  "anthropic-version": "2023-06-01",
+              },
+          )
+
+          with urllib.request.urlopen(req) as resp:
+              result = json.load(resp)
+
+          review = "".join(b.get("text", "") for b in result.get("content", []))
+          with open("review.md", "w") as f:
+              f.write(review or "Claude returned no review text.")
+          EOF
+
+      - name: Post review as a PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const review = fs.readFileSync('review.md', 'utf8');
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🤖 Claude Code Review\n\n${review}`
+            });
