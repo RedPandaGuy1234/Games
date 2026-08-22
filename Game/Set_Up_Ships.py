@@ -1,6 +1,6 @@
 """Set up ship placements for a game of Battleship."""
 
-import Locations  # noqa: F401  (kept for future multi-file ship-data linking)
+import Locations  # noqa: F401  # pylint: disable=unused-import
 
 col_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
@@ -99,3 +99,4 @@ else:
     make_sure_coordinate_is_correct(patrol_boat, 1, 1)
     patrol_boat[1] = converted_coordinate
     used_coordinates[1] = converted_coordinate
+ 
