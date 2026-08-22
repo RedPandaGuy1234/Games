@@ -99,4 +99,3 @@ else:
     make_sure_coordinate_is_correct(patrol_boat, 1, 1)
     patrol_boat[1] = converted_coordinate
     used_coordinates[1] = converted_coordinate
- 
