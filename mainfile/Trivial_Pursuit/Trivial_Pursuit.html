@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trivial Pursuit — A Game for 2–5 People</title>
+<title>The Questions — A Trivia Game for 1–5 People</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -65,6 +65,9 @@
   }
   .count-btns button.active{
     background:var(--gold); color:var(--felt-dark); border-color:var(--gold);
+  }
+  .setup-note{
+    font-size:11.5px; color:var(--cream-dim); opacity:.8; margin:-10px 0 16px; text-align:center;
   }
 
   .layout{
@@ -232,6 +235,10 @@
   .player-swatch{
     width:11px; height:11px; border-radius:50%; flex:none;
   }
+  .ai-tag{
+    font-size:9px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--felt-dark); background:var(--gold); padding:2px 6px; border-radius:999px;
+  }
   .player-card input{
     background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,.2);
     color:var(--cream); font-family:'Fraunces',serif; font-weight:600; font-size:14.5px;
@@ -283,6 +290,13 @@
   .btn-correct{background:#3E8E5B; color:#fff;}
   .btn-wrong{background:#B4552A; color:#fff;}
   .card-sub{font-size:12px; color:#8a8577; margin-top:14px;}
+  .ai-thinking{
+    width:100%; text-align:center; font-family:'Fraunces',serif; font-weight:600;
+    font-size:15px; padding:13px 0; color:var(--ink);
+  }
+  .ai-thinking{
+    font-size:14px; color:#5a5648; text-align:center; padding:10px 0; font-style:italic;
+  }
 
   /* ---------- Win overlay ---------- */
   .win-card{text-align:center;}
@@ -300,13 +314,15 @@
   <div class="brand">
     <div class="eyebrow">1–5 Players · One Board · Six Wedges</div>
     <h1>Six Wedges</h1>
-    <p>Roll the die, choose a direction, and answer whatever category you land on. Once you've collected all six wedges, the others pick your final category — get it right and you win.</p>
+    <p>Roll the die, choose a direction, and answer whatever category you land on. Once you've collected all six wedges, the others (or the computer) pick your final category — get it right and you win. Play solo against the AI, or pass the device around with friends.</p>
   </div>
 
   <div class="setup-row">
     <span>Players:</span>
     <div class="count-btns" id="countBtns"></div>
+    <span style="opacity:.7;">(1 = solo vs AI)</span>
   </div>
+  <div class="setup-note" id="setupNote"></div>
   <div class="setup-row" id="aiDifficultyRow" style="display:none">
     <span>AI difficulty:</span>
     <div class="count-btns" id="difficultyBtns"></div>
@@ -588,9 +604,20 @@
   let gameOver = false;
   let pendingSteps = null;   // die result waiting on a direction choice
   let finalAttempt = false;  // true when the open card is a deciding question
+  const AI_CORRECT_CHANCE = 0.6;
 
   function makePlayers(n){
-    return Array.from({length:n}, (_,i)=>({name:'Player '+(i+1), wedges:new Set(), position:0}));
+    if(n===1){
+      return [
+        {name:'Player 1', wedges:new Set(), position:0, isAI:false},
+        {name:'Computer',  wedges:new Set(), position:0, isAI:true},
+      ];
+    }
+    return Array.from({length:n}, (_,i)=>({name:'Player '+(i+1), wedges:new Set(), position:0, isAI:false}));
+  }
+
+  function othersAreAllAI(){
+    return players.every((p,i)=> i===turn || p.isAI);
   }
 
   function freshPools(){
@@ -646,7 +673,7 @@
       el.className = 'token ring-'+(idx%5);
       el.id = 'token'+idx;
       el.innerHTML = `<div class="token-wedges" id="tokenWedges${idx}"></div>
-                       <div class="token-num"><span>${idx+1}</span></div>`;
+                       <div class="token-num"><span>${p.isAI ? '🤖' : (idx+1)}</span></div>`;
       tokensLayer.appendChild(el);
     });
   }
@@ -661,7 +688,7 @@
   }
 
   function formatGroupHTML(idxs){
-    return idxs.map(i=>`<span style="color:${RING_COLORS[i%5]}">${i+1}</span>`).join('');
+    return idxs.map(i=>`<span style="color:${RING_COLORS[i%5]}">${players[i].isAI ? '🤖' : (i+1)}</span>`).join('');
   }
 
   function renderTokens(){
@@ -712,6 +739,7 @@
         <div class="player-head">
           <span class="player-swatch" style="background:${RING_COLORS[idx%5]}"></span>
           <input type="text" value="${p.name}" data-idx="${idx}" maxlength="16">
+          ${p.isAI ? '<span class="ai-tag">AI</span>' : ''}
         </div>
         <div class="wedge-count-mini">${p.wedges.size}/${CATS.length} collected</div>
         <div class="mini-wedges">
@@ -739,9 +767,10 @@
 
   // ---------- player-count control ----------
   const countBtns = document.getElementById('countBtns');
+  const setupNote = document.getElementById('setupNote');
   function buildCountBtns(){
     countBtns.innerHTML = '';
-    for(let n=2;n<=5;n++){
+    for(let n=1;n<=5;n++){
       const b = document.createElement('button');
       b.textContent = n;
       if(n===numPlayers) b.classList.add('active');
@@ -752,6 +781,9 @@
       });
       countBtns.appendChild(b);
     }
+    setupNote.textContent = (numPlayers===1)
+      ? 'Solo mode: you against the computer 🤖'
+      : `${numPlayers} players — pass the device around the table`;
   }
 
   // ---------- turn control switching ----------
@@ -765,10 +797,24 @@
     buildPlayers();
     updateTurnBanner();
     if(gameOver) return;
-    if(players[turn].wedges.size >= CATS.length){
-      showFinalControls();
+    const finalStage = players[turn].wedges.size >= CATS.length;
+    const aiTurn = players[turn].isAI;
+
+    if(aiTurn){
+      if(finalStage){
+        // the other (human) players choose the category; the computer answers once the card opens
+        showFinalControls();
+      } else {
+        runAIRoll();
+      }
     } else {
-      showNormalControls();
+      if(finalStage && othersAreAllAI()){
+        runAIChooseCategory();
+      } else if(finalStage){
+        showFinalControls();
+      } else {
+        showNormalControls();
+      }
     }
   }
 
@@ -776,6 +822,7 @@
     dieRow.style.display = 'flex';
     directionRow.style.display = 'none';
     finalRow.style.display = 'none';
+    rollBtn.textContent = 'Roll the Die';
     busy = false;
     rollBtn.disabled = false;
   }
@@ -800,6 +847,20 @@
         openCard(cat, true);
       });
     });
+  }
+
+  // the computer picks a random category for the human's deciding question
+  function runAIChooseCategory(){
+    dieRow.style.display = 'none';
+    directionRow.style.display = 'none';
+    finalRow.style.display = 'flex';
+    finalCats.innerHTML = '';
+    finalPrompt.textContent = `${players[turn].name} has all six wedges! The computer is choosing a category…`;
+    busy = true;
+    setTimeout(()=>{
+      const cat = CATS[Math.floor(Math.random()*CATS.length)];
+      openCard(cat, true);
+    }, 1100);
   }
 
   // ---------- die ----------
@@ -843,6 +904,31 @@
     }, 90);
   });
 
+  function runAIRoll(){
+    dieRow.style.display = 'flex';
+    directionRow.style.display = 'none';
+    finalRow.style.display = 'none';
+    busy = true;
+    rollBtn.disabled = true;
+    rollBtn.textContent = 'Computer is rolling…';
+    setTimeout(()=>{
+      dieEl.classList.add('rolling');
+      let ticks = 0;
+      const rollInterval = setInterval(()=>{
+        renderDie(1 + Math.floor(Math.random()*6));
+        ticks++;
+        if(ticks > 8){
+          clearInterval(rollInterval);
+          dieEl.classList.remove('rolling');
+          const finalValue = 1 + Math.floor(Math.random()*6);
+          renderDie(finalValue);
+          const direction = Math.random() < 0.5 ? 1 : -1;
+          setTimeout(()=>moveToken(turn, finalValue, direction), 500);
+        }
+      }, 90);
+    }, 600);
+  }
+
   function chooseDirection(direction){
     if(pendingSteps === null) return;
     directionRow.style.display = 'none';
@@ -877,6 +963,7 @@
   function openCard(cat, isFinal){
     currentCat = cat;
     finalAttempt = !!isFinal;
+    const aiTurn = players[turn].isAI;
     const [q,a] = drawQuestion(cat.id);
     cardCat.textContent = cat.name + (finalAttempt ? ' · Deciding Question' : '');
     cardCat.style.background = cat.hex;
@@ -885,7 +972,19 @@
     cardA.classList.remove('show');
     cardSub.textContent = finalAttempt
       ? `${players[turn].name} needs this one to win. Get it right and it's over — get it wrong and it carries to next turn.`
-      : 'The other players judge the answer out loud.';
+      : (aiTurn ? 'Watch the computer answer.' : 'The other players judge the answer out loud.');
+    cardOverlay.classList.add('show');
+
+    if(aiTurn){
+      cardActions.innerHTML = '<div class="ai-thinking">The computer is thinking…</div>';
+      setTimeout(()=>{
+        cardA.classList.add('show');
+        const correct = Math.random() < AI_CORRECT_CHANCE;
+        setTimeout(()=>judge(correct), 900);
+      }, 1000);
+      return;
+    }
+
     cardActions.innerHTML = '<button class="btn-reveal" id="revealBtn">Reveal Answer</button>';
     document.getElementById('revealBtn').addEventListener('click', ()=>{
       cardA.classList.add('show');
@@ -896,7 +995,6 @@
       document.getElementById('wrongBtn').addEventListener('click', ()=>judge(false));
       document.getElementById('correctBtn').addEventListener('click', ()=>judge(true));
     });
-    cardOverlay.classList.add('show');
   }
 
   function judge(correct){
@@ -974,4 +1072,4 @@
 })();
 </script>
 </body>
-</html>
+</html>ml>
