@@ -47,8 +47,10 @@ A browser-based trivia game for 1–5 players (or solo against a computer oppone
 - Optional Hard Mode: missing a question in a category you've already won costs you that wedge
 
 **Play it**
-
-Open `mainfile/The Questions/The Questions.html` directly in a browser.
+```
+cd mainfile/Questions
+open The_Questions.html
+```
 
 ## Requirements
 - **Battleship:** Python 3 or newer, and a terminal
