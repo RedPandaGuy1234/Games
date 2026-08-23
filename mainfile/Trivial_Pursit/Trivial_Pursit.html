@@ -1,1 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Six Wedges — A Trivia Game for 2–5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --felt:#16302A;
+    --felt-dark:#0E211B;
+    --felt-light:#1E3E35;
+    --cream:#F3EAD7;
+    --cream-dim:#E4D8BF;
+    --wood:#8C5A3C;
+    --wood-dark:#6B3E27;
+    --gold:#D4A72C;
+    --ink:#1B2420;
+    --geo:#2F7A78;
+    --hist:#B4552A;
+    --sci:#5B4B8A;
+    --ent:#B9436B;
+    --sport:#D9A521;
+    --art:#4C7A4C;
+    --ring0:#D4A72C;
+    --ring1:#F3EAD7;
+    --ring2:#4FD1C5;
+    --ring3:#F2789A;
+    --ring4:#7CB9F2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 800px at 50% -10%, var(--felt-light), var(--felt) 55%, var(--felt-dark) 100%);
+    color:var(--cream);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:26px 16px 56px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .brand{text-align:center; margin-bottom:16px;}
+  .brand .eyebrow{
+    font-size:11px; letter-spacing:.28em; text-transform:uppercase;
+    color:var(--gold); opacity:.85;
+  }
+  .brand h1{
+    font-family:'Fraunces',serif; font-weight:600;
+    font-size:clamp(30px,5.5vw,48px); margin:6px 0 4px; letter-spacing:.01em;
+  }
+  .brand p{margin:0; font-size:13.5px; color:var(--cream-dim); max-width:460px; margin-inline:auto;}
 
+  .setup-row{
+    display:flex; align-items:center; gap:10px; margin:14px 0 18px;
+    font-size:12.5px; color:var(--cream-dim);
+  }
+  .count-btns{display:flex; gap:6px;}
+  .count-btns button{
+    width:30px; height:30px; border-radius:8px; border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.06); color:var(--cream); font-family:'Fraunces',serif;
+    font-weight:600; font-size:14px; cursor:pointer; transition:all .15s ease;
+  }
+  .count-btns button.active{
+    background:var(--gold); color:var(--felt-dark); border-color:var(--gold);
+  }
+
+  .layout{
+    width:100%; max-width:1080px;
+    display:grid; grid-template-columns:1fr 260px; gap:26px; align-items:start;
+  }
+  @media (max-width:820px){ .layout{grid-template-columns:1fr;} }
+
+  /* ---------- Board column ---------- */
+  .board-col{display:flex; flex-direction:column; align-items:center; gap:16px;}
+  .board-wrap{
+    position:relative;
+    width:min(430px,92vw); height:min(430px,92vw);
+  }
+  .board-space{
+    position:absolute;
+    width:27px; height:27px;
+    margin:-13.5px 0 0 -13.5px;
+    border-radius:7px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:7.5px; font-weight:700; letter-spacing:.01em;
+    color:rgba(255,255,255,.92);
+    text-shadow:0 1px 2px rgba(0,0,0,.35);
+    box-shadow:0 2px 5px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.15);
+  }
+  .board-center{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:160px; height:160px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--wood), var(--wood-dark) 75%);
+    box-shadow:inset 0 0 0 4px rgba(0,0,0,.2), 0 8px 20px rgba(0,0,0,.4);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; text-align:center; padding:10px;
+  }
+  .board-center .center-mark{
+    font-family:'Fraunces',serif; font-weight:600; font-size:15px; color:var(--gold);
+    letter-spacing:.03em;
+  }
+  .board-center .center-sub{font-size:10px; color:rgba(243,234,215,.6);}
+
+  .token{
+    position:absolute;
+    width:28px; height:28px;
+    margin:-14px 0 0 -14px;
+    border-radius:50%;
+    box-shadow:0 3px 6px rgba(0,0,0,.55);
+    transition: left .2s ease, top .2s ease;
+    z-index:6;
+  }
+  .token-wedges{
+    position:absolute; inset:0; border-radius:50%;
+  }
+  .token-num{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:700; font-size:10px; color:#fff;
+  }
+  .token-num::before{
+    content:''; position:absolute; width:13px; height:13px; border-radius:50%;
+    background:rgba(0,0,0,.55);
+  }
+  .token-num span{position:relative; z-index:1;}
+  .token.ring-0{box-shadow:0 0 0 2px var(--ring0), 0 3px 6px rgba(0,0,0,.55);}
+  .token.ring-1{box-shadow:0 0 0 2px var(--ring1), 0 3px 6px rgba(0,0,0,.55);}
+  .token.ring-2{box-shadow:0 0 0 2px var(--ring2), 0 3px 6px rgba(0,0,0,.55);}
+  .token.ring-3{box-shadow:0 0 0 2px var(--ring3), 0 3px 6px rgba(0,0,0,.55);}
+  .token.ring-4{box-shadow:0 0 0 2px var(--ring4), 0 3px 6px rgba(0,0,0,.55);}
+
+  .group-token{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    background:rgba(0,0,0,.78);
+    border:1.5px solid rgba(255,255,255,.55);
+    border-radius:8px;
+    padding:3px 5px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:1px;
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:9.5px;
+    line-height:1.15;
+    z-index:7;
+    box-shadow:0 3px 6px rgba(0,0,0,.5);
+  }
+  .group-token .sep{
+    font-size:7.5px;
+    color:rgba(255,255,255,.6);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+  }
+
+  .legend{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:8px 14px;
+    font-size:11px; color:var(--cream-dim); max-width:360px;
+  }
+  .legend span.dot{
+    display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:5px; vertical-align:middle;
+  }
+
+  .turn-banner{font-size:13.5px; color:var(--cream-dim); text-align:center;}
+  .turn-banner b{color:var(--gold); font-family:'Fraunces',serif; font-weight:600; font-size:16px;}
+
+  .die-row{display:flex; align-items:center; gap:16px;}
+  .die{
+    width:52px; height:52px; border-radius:11px;
+    background:linear-gradient(180deg,#fff,#e9e2d2);
+    box-shadow:0 4px 0 #b7ac93, 0 8px 16px rgba(0,0,0,.35);
+    display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr);
+    padding:7px; transition:transform .1s ease;
+  }
+  .die.rolling{animation:rollSpin .12s linear infinite;}
+  @keyframes rollSpin{
+    0%{transform:rotate(0deg);} 50%{transform:rotate(8deg);} 100%{transform:rotate(-8deg);}
+  }
+  .pip{border-radius:50%; background:transparent;}
+  .pip.on{background:var(--felt-dark);}
+
+  .spin-btn{
+    font-family:'Fraunces',serif; font-weight:600; font-size:15.5px;
+    color:var(--felt-dark);
+    background:linear-gradient(180deg,#E7C866,var(--gold));
+    border:none; padding:12px 26px; border-radius:999px; cursor:pointer;
+    box-shadow:0 4px 0 #9a7620, 0 8px 16px rgba(0,0,0,.35);
+    letter-spacing:.02em;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .spin-btn:active{transform:translateY(3px); box-shadow:0 1px 0 #9a7620, 0 4px 8px rgba(0,0,0,.3);}
+  .spin-btn:disabled{opacity:.45; cursor:default; transform:none;}
+  .ai-status{font-size:13px; color:var(--cream-dim); font-style:italic;}
+
+  .direction-row{display:flex; align-items:center; gap:10px; font-size:12px; color:var(--cream-dim);}
+  .dir-btn{
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.28);
+    color:var(--cream); font-family:'Inter',sans-serif; font-weight:600; font-size:12.5px;
+    padding:9px 14px; border-radius:999px; cursor:pointer; transition:background .15s ease, transform .12s ease;
+  }
+  .dir-btn:hover{background:rgba(255,255,255,.16);}
+  .dir-btn:active{transform:translateY(2px);}
+
+  .final-row{display:flex; flex-direction:column; align-items:center; gap:10px; max-width:340px;}
+  .final-prompt{font-size:12.5px; color:var(--cream-dim); text-align:center; line-height:1.4;}
+  .final-cats{display:flex; flex-wrap:wrap; gap:7px; justify-content:center;}
+  .final-cat-btn{
+    border:none; border-radius:999px; padding:8px 14px;
+    font-family:'Fraunces',serif; font-weight:600; font-size:12px; color:#fff;
+    cursor:pointer; box-shadow:0 3px 6px rgba(0,0,0,.35); transition:transform .12s ease;
+  }
+  .final-cat-btn:active{transform:translateY(2px);}
+  .final-cat-btn:disabled{opacity:.5; cursor:default;}
+
+  /* ---------- Side panel: players (compact) ---------- */
+  .players{display:flex; flex-direction:column; gap:10px; width:100%;}
+  .player-card{
+    background:rgba(0,0,0,.18);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:12px; padding:10px 12px;
+    display:flex; flex-direction:column; gap:5px;
+    transition:border-color .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .player-card.active{
+    border-color:var(--gold); background:rgba(212,167,44,.1);
+    box-shadow:0 0 0 1px rgba(212,167,44,.35), 0 6px 14px rgba(0,0,0,.25);
+  }
+  .player-head{display:flex; align-items:center; gap:8px;}
+  .player-swatch{
+    width:11px; height:11px; border-radius:50%; flex:none;
+  }
+  .player-card input{
+    background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,.2);
+    color:var(--cream); font-family:'Fraunces',serif; font-weight:600; font-size:14.5px;
+    padding:1px 1px 4px; width:100%;
+  }
+  .player-card input:focus{outline:none; border-color:var(--gold);}
+  .wedge-count-mini{font-size:10.5px; color:var(--gold); font-weight:600;}
+  .mini-wedges{display:flex; gap:4px;}
+  .mini-dot{
+    width:12px; height:12px; border-radius:50%;
+    border:1.5px dashed rgba(255,255,255,.28);
+    background:rgba(255,255,255,.04);
+  }
+  .mini-dot.won{border-style:solid; border-color:rgba(255,255,255,.55);}
+
+  .reset-link{background:none; border:none; color:var(--cream-dim); font-size:11.5px; text-decoration:underline; cursor:pointer; margin-top:2px; align-self:flex-start;}
+
+  /* ---------- Card modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(10,18,15,.72); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay.show{display:flex;}
+  .card{
+    width:min(440px,100%); background:var(--cream); color:var(--ink);
+    border-radius:18px; padding:28px 26px 24px; box-shadow:0 20px 50px rgba(0,0,0,.5);
+    position:relative; animation:cardIn .35s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes cardIn{ from{transform:translateY(16px) scale(.96); opacity:0;} to{transform:none; opacity:1;} }
+  .card-cat{
+    display:inline-block; font-family:'Fraunces',serif; font-weight:600; font-size:12.5px;
+    letter-spacing:.06em; text-transform:uppercase; color:#fff; padding:5px 14px;
+    border-radius:999px; margin-bottom:16px;
+  }
+  .card-q{font-family:'Fraunces',serif; font-weight:500; font-size:21px; line-height:1.4; margin:0 0 18px;}
+  .card-a{
+    font-size:15px; background:rgba(0,0,0,.05); border-left:4px solid var(--gold);
+    padding:12px 14px; border-radius:6px; margin-bottom:20px; display:none;
+  }
+  .card-a.show{display:block;}
+  .card-a b{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#8a7a4a; margin-bottom:4px;}
+  .card-actions{display:flex; gap:10px; flex-wrap:wrap;}
+  .card-actions button{
+    flex:1; min-width:120px; font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
+    padding:12px 14px; border-radius:10px; border:none; cursor:pointer; transition:transform .12s ease;
+  }
+  .card-actions button:active{transform:translateY(2px);}
+  .btn-reveal{background:var(--felt); color:var(--cream);}
+  .btn-correct{background:#3E8E5B; color:#fff;}
+  .btn-wrong{background:#B4552A; color:#fff;}
+  .card-sub{font-size:12px; color:#8a8577; margin-top:14px;}
+
+  /* ---------- Win overlay ---------- */
+  .win-card{text-align:center;}
+  .win-card h2{font-family:'Fraunces',serif; font-size:28px; margin:6px 0 8px;}
+  .win-card p{margin:0 0 20px; font-size:14px; color:#5a5648;}
+  .confetti-wrap{position:relative; height:0;}
+  .confetti{position:absolute; width:10px; height:16px; top:-30px; opacity:.9; animation:fall 2.6s ease-in forwards;}
+  @keyframes fall{ to{ transform:translateY(340px) rotate(400deg); opacity:0; } }
+
+  footer{margin-top:30px; font-size:11.5px; color:rgba(243,234,215,.4); text-align:center;}
+</style>
+</head>
+<body>
+
+  <div class="brand">
+    <div class="eyebrow">1–5 Players · One Board · Six Wedges</div>
+    <h1>Six Wedges</h1>
+    <p>Roll the die, choose a direction, and answer whatever category you land on. Once you've collected all six wedges, the others pick your final category — get it right and you win.</p>
+  </div>
+
+  <div class="setup-row">
+    <span>Players:</span>
+    <div class="count-btns" id="countBtns"></div>
+  </div>
+  <div class="setup-row" id="aiDifficultyRow" style="display:none">
+    <span>AI difficulty:</span>
+    <div class="count-btns" id="difficultyBtns"></div>
+  </div>
+
+  <div class="layout">
+    <div class="board-col">
+      <div class="board-wrap" id="boardWrap">
+        <div class="board-center">
+          <div class="center-mark">SIX WEDGES</div>
+          <div class="center-sub">Collect one of every color</div>
+        </div>
+        <div id="tokensLayer"></div>
+        <div id="groupLayer"></div>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="turn-banner">It's <b id="turnName">Player 1</b>'s turn — <span id="turnAction">roll the die</span></div>
+      <div class="die-row" id="dieRow">
+        <div class="die" id="die"></div>
+        <button class="spin-btn" id="rollBtn">Roll the Die</button>
+        <div class="ai-status" id="aiStatus" style="display:none">🤖 AI is rolling…</div>
+      </div>
+      <div class="direction-row" id="directionRow" style="display:none">
+        <span>Which way?</span>
+        <button class="dir-btn" id="dirCW">Clockwise ↻</button>
+        <button class="dir-btn" id="dirCCW">Counter-clockwise ↺</button>
+      </div>
+      <div class="final-row" id="finalRow" style="display:none">
+        <div class="final-prompt" id="finalPrompt">Other players, choose a category:</div>
+        <div class="final-cats" id="finalCats"></div>
+      </div>
+    </div>
+
+    <div class="players" id="players"></div>
+  </div>
+
+  <footer>Answer honestly, judge kindly. Change the player count anytime to start fresh.</footer>
+
+  <div class="overlay" id="cardOverlay">
+    <div class="card">
+      <div class="card-cat" id="cardCat">Category</div>
+      <div class="card-q" id="cardQ">Question goes here</div>
+      <div class="card-a" id="cardA"><b>Answer</b><span id="cardAText"></span></div>
+      <div class="card-actions" id="cardActions">
+        <button class="btn-reveal" id="revealBtn">Reveal Answer</button>
+      </div>
+      <div class="card-sub" id="cardSub">The other players judge the answer out loud.</div>
+    </div>
+  </div>
+
+  <div class="overlay" id="winOverlay">
+    <div class="card win-card">
+      <div class="confetti-wrap" id="confettiWrap"></div>
+      <h2 id="winTitle">🎉 Player 1 wins!</h2>
+      <p>All six wedges collected. Nicely played.</p>
+      <div class="card-actions">
+        <button class="btn-correct" id="playAgainBtn">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const CATS = [
+    {id:'geo',   name:'Geography',      hex:'#2F7A78', abbr:'GEO'},
+    {id:'hist',  name:'History',        hex:'#B4552A', abbr:'HIS'},
+    {id:'sci',   name:'Science',        hex:'#5B4B8A', abbr:'SCI'},
+    {id:'ent',   name:'Entertainment',  hex:'#B9436B', abbr:'ENT'},
+    {id:'sport', name:'Sports',         hex:'#D9A521', abbr:'SPT'},
+    {id:'art',   name:'Arts & Words',   hex:'#4C7A4C', abbr:'ART'},
+  ];
+  const RING_COLORS = ['#D4A72C','#F3EAD7','#4FD1C5','#F2789A','#7CB9F2'];
+
+  const BANK = {
+    geo: [
+      ["Which river is traditionally considered the longest in the world?","The Nile"],
+      ["What is the smallest country in the world by area?","Vatican City"],
+      ["Which desert is the largest hot desert on Earth?","The Sahara"],
+      ["Mount Kilimanjaro is the highest peak on which continent?","Africa"],
+      ["What is the capital city of Australia?","Canberra"],
+      ["Which ocean is the largest by surface area?","The Pacific Ocean"],
+      ["What mountain range is often cited as the boundary between Europe and Asia?","The Ural Mountains"],
+      ["Which country has more lakes than any other in the world?","Canada"],
+      ["Which continent has the most countries?","Africa"],
+      ["What strait separates Asia from North America?","The Bering Strait"],
+      ["What is the capital of Canada?","Ottawa"],
+      ["What is the capital of Japan?","Tokyo"],
+      ["Which mountain is the tallest in the world above sea level?","Mount Everest"],
+      ["What is the largest country in the world by land area?","Russia"],
+      ["Which river flows through Egypt and empties into the Mediterranean?","The Nile"],
+      ["What is the smallest continent by land area?","Australia"],
+      ["Which two countries share the longest international border in the world?","The United States and Canada"],
+      ["What is the capital of Egypt?","Cairo"],
+      ["Which sea is famous for being so salty that swimmers float easily?","The Dead Sea"],
+      ["What is the capital of Brazil?","Brasília"],
+      ["Which country is shaped like a boot?","Italy"],
+      ["What is the name for the vast, arid interior of Australia?","The Outback"],
+      ["Which country has the most time zones, due to its overseas territories?","France"],
+      ["What is the capital of South Korea?","Seoul"],
+      ["Which US state is the largest by land area?","Alaska"],
+      ["What is the name of the imaginary line at zero degrees longitude?","The Prime Meridian"],
+      ["Which country straddles both Europe and Asia across the Bosphorus Strait?","Turkey"],
+      ["What is the capital of Russia?","Moscow"],
+      ["Which strait separates Europe from Africa at its narrowest point?","The Strait of Gibraltar"],
+      ["What is the capital of India?","New Delhi"],
+    ],
+    hist: [
+      ["In what year did World War II end?","1945"],
+      ["Who was the first President of the United States?","George Washington"],
+      ["Which ancient wonder once stood in the harbor of Alexandria, Egypt?","The Lighthouse of Alexandria"],
+      ["In what year did the Berlin Wall fall?","1989"],
+      ["Who is credited as the primary author of the Declaration of Independence?","Thomas Jefferson"],
+      ["Which empire built the Colosseum?","The Roman Empire"],
+      ["In which century did the Renaissance begin?","The 14th century"],
+      ["Which British queen ruled for over 63 years in the 19th century?","Queen Victoria"],
+      ["What famous ship sank on its maiden voyage in 1912?","The Titanic"],
+      ["Who led the Soviet Union during the Cuban Missile Crisis?","Nikita Khrushchev"],
+      ["Who was the first man to walk on the Moon?","Neil Armstrong"],
+      ["Which war was fought between the North and South regions of the United States in the 1860s?","The American Civil War"],
+      ["Who was the British Prime Minister for most of World War II?","Winston Churchill"],
+      ["In what year did the French Revolution begin?","1789"],
+      ["Which ancient civilization built the pyramids of Giza?","The ancient Egyptians"],
+      ["In what year did Christopher Columbus first reach the Americas?","1492"],
+      ["Which queen of Egypt was famously allied with Julius Caesar and Mark Antony?","Cleopatra"],
+      ["In what year did India gain independence from British rule?","1947"],
+      ["Who was the first Emperor of Rome?","Augustus"],
+      ["What treaty officially ended World War I?","The Treaty of Versailles"],
+      ["Which explorer's expedition was the first to circumnavigate the globe, though he died partway through?","Ferdinand Magellan"],
+      ["In what year did the Wright brothers achieve the first powered flight?","1903"],
+      ["Who led India's independence movement through nonviolent protest?","Mahatma Gandhi"],
+      ["What ancient structure in China stretches thousands of miles and was built to defend against invasions?","The Great Wall of China"],
+      ["In what year did the United States declare independence?","1776"],
+      ["Which royal dynasty, including Henry VIII, ruled England in the 16th century?","The Tudors"],
+      ["What was the name of the global flu pandemic that occurred in 1918?","The Spanish Flu"],
+      ["Who was the last Tsar of Russia?","Nicholas II"],
+      ["Which US president served during the Great Depression and much of World War II?","Franklin D. Roosevelt"],
+      ["What year did the Titanic set sail on its only voyage?","1912"],
+    ],
+    sci: [
+      ["What is the chemical symbol for gold?","Au"],
+      ["How many bones are in the adult human body?","206"],
+      ["Which planet is known as the Red Planet?","Mars"],
+      ["What gas do plants primarily absorb during photosynthesis?","Carbon dioxide"],
+      ["What is often called the powerhouse of the cell?","The mitochondria"],
+      ["What force keeps the planets in orbit around the sun?","Gravity"],
+      ["Roughly how fast does light travel in a vacuum?","About 300,000 km per second"],
+      ["What is the hardest naturally occurring substance on Earth?","Diamond"],
+      ["At sea level, what temperature (Celsius) does water boil at?","100°C"],
+      ["Which subatomic particle carries a negative charge?","The electron"],
+      ["What is the largest planet in our solar system?","Jupiter"],
+      ["What is H2O more commonly known as?","Water"],
+      ["What organ pumps blood throughout the human body?","The heart"],
+      ["What is the process by which plants make their own food using sunlight?","Photosynthesis"],
+      ["What is the smallest structural and functional unit of life?","The cell"],
+      ["Which gas makes up most of Earth's atmosphere?","Nitrogen"],
+      ["What is the name for the layer of gases surrounding Earth?","The atmosphere"],
+      ["What do you call an animal that eats both plants and meat?","An omnivore"],
+      ["What is the freezing point of water in Celsius?","0°C"],
+      ["Which scientist developed the theory of general relativity?","Albert Einstein"],
+      ["What is the name of the closest star to Earth?","The Sun"],
+      ["What is the largest organ in the human body?","The skin"],
+      ["How many planets are in our solar system?","8"],
+      ["What is the chemical symbol for oxygen?","O"],
+      ["What natural phenomenon is caused by the refraction of light in water droplets?","A rainbow"],
+      ["What is the study of living organisms called?","Biology"],
+      ["Which blood type is known as the universal donor?","O negative"],
+      ["What is the name of Earth's only natural satellite?","The Moon"],
+      ["What vitamin does the body mainly produce from sunlight exposure?","Vitamin D"],
+      ["What do you call the force that resists motion between two surfaces in contact?","Friction"],
+    ],
+    ent: [
+      ["Who directed the 1975 film Jaws?","Steven Spielberg"],
+      ["Which British band released the album Abbey Road?","The Beatles"],
+      ["In which Pixar movie does a clownfish search for his missing son?","Finding Nemo"],
+      ["Who played the character Jack in the movie Titanic?","Leonardo DiCaprio"],
+      ["The Simpsons is set in a fictional town named what?","Springfield"],
+      ["How many keys does a standard piano have?","88"],
+      ["Which streaming service originally produced Stranger Things?","Netflix"],
+      ["Which entertainer is known as the King of Pop?","Michael Jackson"],
+      ["What everyday object does a DJ use two of, spun by hand?","Turntables"],
+      ["Which classic children's story features a boy who never grows up?","Peter Pan"],
+      ["Who composed the opera The Magic Flute?","Wolfgang Amadeus Mozart"],
+      ["Which streaming platform is known for the show The Crown?","Netflix"],
+      ["What is the name of the wizarding school in Harry Potter?","Hogwarts"],
+      ["Who played the Joker in The Dark Knight (2008)?","Heath Ledger"],
+      ["Which animated film features a snowman named Olaf?","Frozen"],
+      ["What instrument does a typical rock band's lead guitarist play?","The guitar"],
+      ["Which artist is known for the album Thriller?","Michael Jackson"],
+      ["What is the name of the fictional African nation in Black Panther?","Wakanda"],
+      ["Which long-running animated show features a family named the Griffins?","Family Guy"],
+      ["Who directed Jurassic Park (1993)?","Steven Spielberg"],
+      ["Which movie franchise features lightsabers and the Force?","Star Wars"],
+      ["Which singer is known as the Queen of Pop?","Madonna"],
+      ["What is the name of the coffee shop in the TV show Friends?","Central Perk"],
+      ["Which classic monster story features a scientist who reanimates the dead using electricity?","Frankenstein"],
+      ["Who wrote the musical Hamilton?","Lin-Manuel Miranda"],
+      ["What is the highest honor awarded at the Academy Awards?","An Oscar"],
+      ["Which video game franchise features a plumber named Mario?","Super Mario"],
+      ["Which British band is known for the song Bohemian Rhapsody?","Queen"],
+      ["Which Disney film tells the story of a mermaid who longs to be human?","The Little Mermaid"],
+      ["Which rock musician is nicknamed 'The Boss', famous for Born to Run?","Bruce Springsteen"],
+    ],
+    sport: [
+      ["How many players from each team are on the field in a standard soccer match?","11"],
+      ["A slam dunk is a move most associated with which sport?","Basketball"],
+      ["How often are the Summer Olympic Games held?","Every 4 years"],
+      ["Which tournament is played on the grass courts of the All England Club?","Wimbledon"],
+      ["How many interlocking rings appear on the Olympic flag?","5"],
+      ["In tennis, what is the term for a score of zero?","Love"],
+      ["In golf, what is the term for finishing a hole one stroke under par?","A birdie"],
+      ["Which country has won the most FIFA World Cup titles?","Brazil"],
+      ["Which sport is played with a shuttlecock?","Badminton"],
+      ["How many players from each team are on the court in basketball?","5"],
+      ["How many holes are played in a standard round of golf?","18"],
+      ["In which sport do players use a puck instead of a ball?","Ice hockey"],
+      ["What is the maximum possible score in ten-pin bowling?","300"],
+      ["How many players are on a standard volleyball team on the court?","6"],
+      ["In American football, how many points is a touchdown worth?","6"],
+      ["Which country is credited with inventing the sport of table tennis?","England"],
+      ["Approximately how many miles long is a marathon race?","26.2 miles"],
+      ["What sport is most associated with the term 'hat-trick'?","Ice hockey (or soccer)"],
+      ["In which sport would a competitor perform a 'pirouette'?","Figure skating"],
+      ["How many rounds are typically in a professional boxing match?","12"],
+      ["What sport is played at the Masters Tournament?","Golf"],
+      ["In cricket, what do you call it when a bowler takes three wickets on three consecutive deliveries?","A hat-trick"],
+      ["How many players are on a baseball team on the field at once?","9"],
+      ["What sport features events like the pommel horse and balance beam?","Gymnastics"],
+      ["What is the term for a perfect score in gymnastics?","A 10"],
+      ["In which sport is the term 'love' used to denote a score of zero?","Tennis"],
+      ["Which country primarily hosts the Tour de France?","France"],
+      ["What sport is Michael Phelps famous for?","Swimming"],
+      ["How many periods are in a standard ice hockey game?","3"],
+      ["What sport uses terms like 'birdie', 'eagle', and 'bogey'?","Golf"],
+    ],
+    art: [
+      ["Who painted the Mona Lisa?","Leonardo da Vinci"],
+      ["Which playwright wrote Romeo and Juliet?","William Shakespeare"],
+      ["Which artist famously cut off part of his own ear?","Vincent van Gogh"],
+      ["What is the study of the origin of words called?","Etymology"],
+      ["Who wrote the Harry Potter book series?","J.K. Rowling"],
+      ["Salvador Dalí is closely associated with which art movement?","Surrealism"],
+      ["How many lines are in a traditional sonnet?","14"],
+      ["Who sculpted the famous statue of David?","Michelangelo"],
+      ["Which language has the most native speakers worldwide?","Mandarin Chinese"],
+      ["Who wrote the novel Pride and Prejudice?","Jane Austen"],
+      ["Who wrote the play Hamlet?","William Shakespeare"],
+      ["Which artist painted Starry Night?","Vincent van Gogh"],
+      ["Who wrote the Chronicles of Narnia series?","C.S. Lewis"],
+      ["What art style did Pablo Picasso help found, known for fragmented, geometric forms?","Cubism"],
+      ["Who wrote The Great Gatsby?","F. Scott Fitzgerald"],
+      ["What is the term for a 14-line poem, often about love?","A sonnet"],
+      ["Who painted the ceiling of the Sistine Chapel?","Michelangelo"],
+      ["Which author created the detective Sherlock Holmes?","Sir Arthur Conan Doyle"],
+      ["What do you call a traditional story passed down orally through generations?","A folktale"],
+      ["Who wrote the novel Moby-Dick?","Herman Melville"],
+      ["Which sculptor created The Thinker?","Auguste Rodin"],
+      ["What do you call a painting an artist makes of themselves?","A self-portrait"],
+      ["Who wrote 1984 and Animal Farm?","George Orwell"],
+      ["Which art movement is Claude Monet associated with?","Impressionism"],
+      ["Who wrote the ancient epic poem The Odyssey?","Homer"],
+      ["What do you call the repeated rhythmic pattern in a poem?","Meter"],
+      ["Which author wrote To Kill a Mockingbird?","Harper Lee"],
+      ["What is the name of Leonardo da Vinci's famous painting of Jesus and his apostles at a final meal?","The Last Supper"],
+      ["Who is known as the father of English literature, author of The Canterbury Tales?","Geoffrey Chaucer"],
+      ["Which Russian author wrote War and Peace?","Leo Tolstoy"],
+    ],
+  };
+
+  const BOARD_SIZE = 36; // six full cycles of the six categories
+  const boardSpaces = Array.from({length:BOARD_SIZE}, (_,i)=>CATS[i % CATS.length]);
+
+  // ---------- state ----------
+  let numPlayers = 2;
+  let players = [];
+  let turn = 0;
+  let pools = {};
+  let currentCat = null;
+  let busy = false;
+  let gameOver = false;
+  let pendingSteps = null;   // die result waiting on a direction choice
+  let finalAttempt = false;  // true when the open card is a deciding question
+
+  function makePlayers(n){
+    return Array.from({length:n}, (_,i)=>({name:'Player '+(i+1), wedges:new Set(), position:0}));
+  }
+
+  function freshPools(){
+    pools = {};
+    CATS.forEach(c=>{ pools[c.id] = shuffle(BANK[c.id].slice()); });
+  }
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    return arr;
+  }
+  function drawQuestion(catId){
+    if(pools[catId].length===0){ pools[catId] = shuffle(BANK[catId].slice()); }
+    return pools[catId].pop();
+  }
+
+  // ---------- board (static spaces built once) ----------
+  const boardWrap = document.getElementById('boardWrap');
+  const tokensLayer = document.getElementById('tokensLayer');
+  const groupLayer = document.getElementById('groupLayer');
+  const RADIUS = 178;
+  const CENTER = 215;
+  function polar(i,r){
+    const angle = (i/BOARD_SIZE)*2*Math.PI - Math.PI/2;
+    return { x: CENTER + r*Math.cos(angle), y: CENTER + r*Math.sin(angle) };
+  }
+  function buildBoardSpaces(){
+    for(let i=0;i<BOARD_SIZE;i++){
+      const cat = boardSpaces[i];
+      const p = polar(i, RADIUS);
+      const el = document.createElement('div');
+      el.className = 'board-space';
+      el.style.left = p.x+'px';
+      el.style.top = p.y+'px';
+      el.style.background = cat.hex;
+      el.textContent = cat.abbr;
+      boardWrap.appendChild(el);
+    }
+  }
+  buildBoardSpaces();
+
+  // legend
+  const legendEl = document.getElementById('legend');
+  legendEl.innerHTML = CATS.map(c=>`<span><span class="dot" style="background:${c.hex}"></span>${c.name}</span>`).join('');
+
+  // ---------- tokens (rebuilt whenever player count changes) ----------
+  function buildTokens(){
+    tokensLayer.innerHTML = '';
+    players.forEach((p,idx)=>{
+      const el = document.createElement('div');
+      el.className = 'token ring-'+(idx%5);
+      el.id = 'token'+idx;
+      el.innerHTML = `<div class="token-wedges" id="tokenWedges${idx}"></div>
+                       <div class="token-num"><span>${idx+1}</span></div>`;
+      tokensLayer.appendChild(el);
+    });
+  }
+
+  function tokenGradient(player){
+    const slice = 360/CATS.length;
+    const parts = CATS.map((c,i)=>{
+      const color = player.wedges.has(c.id) ? c.hex : 'rgba(255,255,255,0.16)';
+      return `${color} ${i*slice}deg ${(i+1)*slice}deg`;
+    });
+    return `conic-gradient(from 0deg, ${parts.join(',')})`;
+  }
+
+  function formatGroupHTML(idxs){
+    return idxs.map(i=>`<span style="color:${RING_COLORS[i%5]}">${i+1}</span>`).join('');
+  }
+
+  function renderTokens(){
+    const groups = {};
+    players.forEach((p,idx)=>{ (groups[p.position] = groups[p.position] || []).push(idx); });
+
+    // individual tokens: shown only when alone on a tile
+    players.forEach((p,idx)=>{
+      const group = groups[p.position];
+      const el = document.getElementById('token'+idx);
+      if(!el) return;
+      if(group.length>1){
+        el.style.display = 'none';
+      } else {
+        el.style.display = '';
+        const pt = polar(p.position, RADIUS);
+        el.style.left = pt.x+'px';
+        el.style.top = pt.y+'px';
+        const wedgesEl = document.getElementById('tokenWedges'+idx);
+        if(wedgesEl) wedgesEl.style.background = tokenGradient(p);
+      }
+    });
+
+    // shared tiles: one badge listing the player numbers, e.g. "1, 2, and 3"
+    groupLayer.innerHTML = '';
+    Object.keys(groups).forEach(posKey=>{
+      const idxs = groups[posKey];
+      if(idxs.length>1){
+        const pt = polar(parseInt(posKey,10), RADIUS-24);
+        const badge = document.createElement('div');
+        badge.className = 'group-token';
+        badge.style.left = pt.x+'px';
+        badge.style.top = pt.y+'px';
+        badge.innerHTML = formatGroupHTML(idxs);
+        groupLayer.appendChild(badge);
+      }
+    });
+  }
+
+  // ---------- player panels ----------
+  const playersEl = document.getElementById('players');
+  function buildPlayers(){
+    playersEl.innerHTML = '';
+    players.forEach((p,idx)=>{
+      const card = document.createElement('div');
+      card.className = 'player-card' + (idx===turn && !gameOver ? ' active':'');
+      card.innerHTML = `
+        <div class="player-head">
+          <span class="player-swatch" style="background:${RING_COLORS[idx%5]}"></span>
+          <input type="text" value="${p.name}" data-idx="${idx}" maxlength="16">
+        </div>
+        <div class="wedge-count-mini">${p.wedges.size}/${CATS.length} collected</div>
+        <div class="mini-wedges">
+          ${CATS.map(c=>`<div class="mini-dot ${p.wedges.has(c.id)?'won':''}" style="${p.wedges.has(c.id)?`background:${c.hex};`:''}" title="${c.name}"></div>`).join('')}
+        </div>
+      `;
+      playersEl.appendChild(card);
+    });
+    playersEl.querySelectorAll('input').forEach(inp=>{
+      inp.addEventListener('input', e=>{
+        const idx = +e.target.dataset.idx;
+        players[idx].name = e.target.value || ('Player '+(idx+1));
+        updateTurnBanner();
+      });
+    });
+  }
+
+  function updateTurnBanner(){
+    document.getElementById('turnName').textContent = players[turn].name;
+    const action = document.getElementById('turnAction');
+    action.textContent = (!gameOver && players[turn].wedges.size >= CATS.length)
+      ? 'answer the deciding question'
+      : 'roll the die';
+  }
+
+  // ---------- player-count control ----------
+  const countBtns = document.getElementById('countBtns');
+  function buildCountBtns(){
+    countBtns.innerHTML = '';
+    for(let n=2;n<=5;n++){
+      const b = document.createElement('button');
+      b.textContent = n;
+      if(n===numPlayers) b.classList.add('active');
+      b.addEventListener('click', ()=>{
+        if(busy) return;
+        numPlayers = n;
+        startNewGame();
+      });
+      countBtns.appendChild(b);
+    }
+  }
+
+  // ---------- turn control switching ----------
+  const dieRow = document.getElementById('dieRow');
+  const directionRow = document.getElementById('directionRow');
+  const finalRow = document.getElementById('finalRow');
+  const finalPrompt = document.getElementById('finalPrompt');
+  const finalCats = document.getElementById('finalCats');
+
+  function beginTurn(){
+    buildPlayers();
+    updateTurnBanner();
+    if(gameOver) return;
+    if(players[turn].wedges.size >= CATS.length){
+      showFinalControls();
+    } else {
+      showNormalControls();
+    }
+  }
+
+  function showNormalControls(){
+    dieRow.style.display = 'flex';
+    directionRow.style.display = 'none';
+    finalRow.style.display = 'none';
+    busy = false;
+    rollBtn.disabled = false;
+  }
+
+  function showFinalControls(){
+    dieRow.style.display = 'none';
+    directionRow.style.display = 'none';
+    finalRow.style.display = 'flex';
+    busy = false;
+    finalPrompt.textContent = `${players[turn].name} has all six wedges! Other players, choose a category for the deciding question:`;
+    renderFinalCatButtons();
+  }
+
+  function renderFinalCatButtons(){
+    finalCats.innerHTML = CATS.map(c=>`<button class="final-cat-btn" data-id="${c.id}" style="background:${c.hex}">${c.name}</button>`).join('');
+    finalCats.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(busy || gameOver) return;
+        busy = true;
+        finalCats.querySelectorAll('button').forEach(b=>b.disabled=true);
+        const cat = CATS.find(c=>c.id===btn.dataset.id);
+        openCard(cat, true);
+      });
+    });
+  }
+
+  // ---------- die ----------
+  const dieEl = document.getElementById('die');
+  const PIP_LAYOUTS = {
+    1:[4], 2:[0,8], 3:[0,4,8], 4:[0,2,6,8], 5:[0,2,4,6,8], 6:[0,2,3,5,6,8]
+  };
+  function renderDie(value){
+    dieEl.innerHTML = '';
+    const on = new Set(PIP_LAYOUTS[value]||[]);
+    for(let i=0;i<9;i++){
+      const pip = document.createElement('div');
+      pip.className = 'pip' + (on.has(i)?' on':'');
+      dieEl.appendChild(pip);
+    }
+  }
+  renderDie(1);
+
+  // ---------- roll, choose direction, then move ----------
+  const rollBtn = document.getElementById('rollBtn');
+  const dirCW = document.getElementById('dirCW');
+  const dirCCW = document.getElementById('dirCCW');
+
+  rollBtn.addEventListener('click', ()=>{
+    if(busy || gameOver) return;
+    busy = true;
+    rollBtn.disabled = true;
+    dieEl.classList.add('rolling');
+    let ticks = 0;
+    const rollInterval = setInterval(()=>{
+      renderDie(1 + Math.floor(Math.random()*6));
+      ticks++;
+      if(ticks > 8){
+        clearInterval(rollInterval);
+        dieEl.classList.remove('rolling');
+        const finalValue = 1 + Math.floor(Math.random()*6);
+        renderDie(finalValue);
+        pendingSteps = finalValue;
+        directionRow.style.display = 'flex';
+      }
+    }, 90);
+  });
+
+  function chooseDirection(direction){
+    if(pendingSteps === null) return;
+    directionRow.style.display = 'none';
+    const steps = pendingSteps;
+    pendingSteps = null;
+    moveToken(turn, steps, direction);
+  }
+  dirCW.addEventListener('click', ()=>chooseDirection(1));
+  dirCCW.addEventListener('click', ()=>chooseDirection(-1));
+
+  function moveToken(playerIdx, stepsLeft, direction){
+    if(stepsLeft <= 0){
+      busy = false;
+      const cat = boardSpaces[players[playerIdx].position];
+      openCard(cat, false);
+      return;
+    }
+    players[playerIdx].position = (players[playerIdx].position + direction + BOARD_SIZE) % BOARD_SIZE;
+    renderTokens();
+    setTimeout(()=>moveToken(playerIdx, stepsLeft-1, direction), 190);
+  }
+
+  // ---------- card modal ----------
+  const cardOverlay = document.getElementById('cardOverlay');
+  const cardCat = document.getElementById('cardCat');
+  const cardQ = document.getElementById('cardQ');
+  const cardA = document.getElementById('cardA');
+  const cardAText = document.getElementById('cardAText');
+  const cardActions = document.getElementById('cardActions');
+  const cardSub = document.getElementById('cardSub');
+
+  function openCard(cat, isFinal){
+    currentCat = cat;
+    finalAttempt = !!isFinal;
+    const [q,a] = drawQuestion(cat.id);
+    cardCat.textContent = cat.name + (finalAttempt ? ' · Deciding Question' : '');
+    cardCat.style.background = cat.hex;
+    cardQ.textContent = q;
+    cardAText.textContent = a;
+    cardA.classList.remove('show');
+    cardSub.textContent = finalAttempt
+      ? `${players[turn].name} needs this one to win. Get it right and it's over — get it wrong and it carries to next turn.`
+      : 'The other players judge the answer out loud.';
+    cardActions.innerHTML = '<button class="btn-reveal" id="revealBtn">Reveal Answer</button>';
+    document.getElementById('revealBtn').addEventListener('click', ()=>{
+      cardA.classList.add('show');
+      cardActions.innerHTML = `
+        <button class="btn-wrong" id="wrongBtn">Got it wrong</button>
+        <button class="btn-correct" id="correctBtn">Got it right</button>
+      `;
+      document.getElementById('wrongBtn').addEventListener('click', ()=>judge(false));
+      document.getElementById('correctBtn').addEventListener('click', ()=>judge(true));
+    });
+    cardOverlay.classList.add('show');
+  }
+
+  function judge(correct){
+    cardOverlay.classList.remove('show');
+    if(gameOver) return; // safety guard: never mutate state after the game has ended
+
+    if(finalAttempt){
+      if(correct){
+        gameOver = true;
+        busy = true;
+        buildPlayers();
+        showWin(players[turn]);
+      } else {
+        turn = (turn+1) % players.length;
+        beginTurn();
+      }
+      return;
+    }
+
+    if(correct){
+      players[turn].wedges.add(currentCat.id);
+    }
+    renderTokens();
+    turn = (turn+1) % players.length;
+    beginTurn();
+  }
+
+  // ---------- win overlay ----------
+  const winOverlay = document.getElementById('winOverlay');
+  const winTitle = document.getElementById('winTitle');
+  const confettiWrap = document.getElementById('confettiWrap');
+  function showWin(player){
+    winTitle.textContent = `🎉 ${player.name} wins!`;
+    confettiWrap.innerHTML = '';
+    const colors = CATS.map(c=>c.hex);
+    for(let i=0;i<24;i++){
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.style.left = (Math.random()*100)+'%';
+      el.style.background = colors[i%colors.length];
+      el.style.animationDelay = (Math.random()*0.6)+'s';
+      el.style.transform = `rotate(${Math.random()*360}deg)`;
+      confettiWrap.appendChild(el);
+    }
+    winOverlay.classList.add('show');
+  }
+  document.getElementById('playAgainBtn').addEventListener('click', ()=>{
+    winOverlay.classList.remove('show');
+    const keepNames = players.map(p=>p.name);
+    players = makePlayers(numPlayers).map((p,i)=>({...p, name: keepNames[i] || p.name}));
+    turn = 0;
+    gameOver = false;
+    pendingSteps = null;
+    freshPools();
+    buildTokens();
+    renderTokens();
+    beginTurn();
+  });
+
+  // ---------- full game (re)start, e.g. on player-count change ----------
+  function startNewGame(){
+    players = makePlayers(numPlayers);
+    turn = 0;
+    gameOver = false;
+    pendingSteps = null;
+    freshPools();
+    buildCountBtns();
+    buildTokens();
+    renderTokens();
+    beginTurn();
+  }
+
+  // ---------- init ----------
+  startNewGame();
+})();
+</script>
+</body>
+</html>
