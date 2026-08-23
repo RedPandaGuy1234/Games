@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Questions — A Trivia Game for 1–5 People</title>
+<title>Six Wedges — A Trivia Game for 2–5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -68,6 +68,14 @@
   }
   .setup-note{
     font-size:11.5px; color:var(--cream-dim); opacity:.8; margin:-10px 0 16px; text-align:center;
+  }
+  .mode-toggle{
+    padding:6px 16px; border-radius:999px; border:1px solid rgba(255,255,255,.24);
+    background:rgba(255,255,255,.06); color:var(--cream); font-family:'Fraunces',serif;
+    font-weight:600; font-size:12.5px; cursor:pointer; transition:all .15s ease;
+  }
+  .mode-toggle.on{
+    background:#B4552A; border-color:#B4552A; color:#fff;
   }
 
   .layout{
@@ -196,7 +204,6 @@
   }
   .spin-btn:active{transform:translateY(3px); box-shadow:0 1px 0 #9a7620, 0 4px 8px rgba(0,0,0,.3);}
   .spin-btn:disabled{opacity:.45; cursor:default; transform:none;}
-  .ai-status{font-size:13px; color:var(--cream-dim); font-style:italic;}
 
   .direction-row{display:flex; align-items:center; gap:10px; font-size:12px; color:var(--cream-dim);}
   .dir-btn{
@@ -280,6 +287,29 @@
   }
   .card-a.show{display:block;}
   .card-a b{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#8a7a4a; margin-bottom:4px;}
+  .card-choices{
+    display:none;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-bottom:20px;
+  }
+  .choice-btn{
+    text-align:left;
+    border:1.5px solid rgba(0,0,0,.14);
+    background:#fff;
+    border-radius:10px;
+    padding:11px 13px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--gold); background:#fdf8ec;}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:#3E8E5B; border-color:#3E8E5B; color:#fff;}
+  .choice-btn.wrong{background:#B4552A; border-color:#B4552A; color:#fff;}
   .card-actions{display:flex; gap:10px; flex-wrap:wrap;}
   .card-actions button{
     flex:1; min-width:120px; font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
@@ -323,9 +353,11 @@
     <span style="opacity:.7;">(1 = solo vs AI)</span>
   </div>
   <div class="setup-note" id="setupNote"></div>
-  <div class="setup-row" id="aiDifficultyRow" style="display:none">
-    <span>AI difficulty:</span>
-    <div class="count-btns" id="difficultyBtns"></div>
+
+  <div class="setup-row">
+    <span>Hard Mode:</span>
+    <button class="mode-toggle" id="hardModeBtn">Off</button>
+    <span style="opacity:.7;">miss a category you've already won and you lose that wedge</span>
   </div>
 
   <div class="layout">
@@ -343,7 +375,6 @@
       <div class="die-row" id="dieRow">
         <div class="die" id="die"></div>
         <button class="spin-btn" id="rollBtn">Roll the Die</button>
-        <div class="ai-status" id="aiStatus" style="display:none">🤖 AI is rolling…</div>
       </div>
       <div class="direction-row" id="directionRow" style="display:none">
         <span>Which way?</span>
@@ -366,6 +397,7 @@
       <div class="card-cat" id="cardCat">Category</div>
       <div class="card-q" id="cardQ">Question goes here</div>
       <div class="card-a" id="cardA"><b>Answer</b><span id="cardAText"></span></div>
+      <div class="card-choices" id="cardChoices"></div>
       <div class="card-actions" id="cardActions">
         <button class="btn-reveal" id="revealBtn">Reveal Answer</button>
       </div>
@@ -428,6 +460,16 @@
       ["What is the capital of Russia?","Moscow"],
       ["Which strait separates Europe from Africa at its narrowest point?","The Strait of Gibraltar"],
       ["What is the capital of India?","New Delhi"],
+      {q:"Which of these cities is the capital of Canada?", choices:["Toronto","Vancouver","Ottawa","Montreal"], correct:2},
+      {q:"Which continent is the Sahara Desert located on?", choices:["Asia","Africa","Australia","South America"], correct:1},
+      {q:"Which of these countries is NOT in South America?", choices:["Peru","Chile","Kenya","Colombia"], correct:2},
+      {q:"What is the longest river in South America?", choices:["Amazon","Nile","Mississippi","Danube"], correct:0},
+      {q:"Which US state is known as the 'Sunshine State'?", choices:["California","Texas","Florida","Arizona"], correct:2},
+      {q:"True or False: The Amazon River is located in Africa.", choices:["True","False"], correct:1},
+      {q:"True or False: Australia is both a country and a continent.", choices:["True","False"], correct:0},
+      {q:"True or False: Mount Everest is located in the Andes mountain range.", choices:["True","False"], correct:1},
+      {q:"True or False: The Sahara Desert is the largest hot desert in the world.", choices:["True","False"], correct:0},
+      {q:"True or False: Canada has a larger population than the United States.", choices:["True","False"], correct:1},
     ],
     hist: [
       ["In what year did World War II end?","1945"],
@@ -460,6 +502,16 @@
       ["Who was the last Tsar of Russia?","Nicholas II"],
       ["Which US president served during the Great Depression and much of World War II?","Franklin D. Roosevelt"],
       ["What year did the Titanic set sail on its only voyage?","1912"],
+      {q:"Who was the first President of the United States?", choices:["Thomas Jefferson","George Washington","John Adams","Abraham Lincoln"], correct:1},
+      {q:"In which year did World War II end?", choices:["1918","1945","1939","1963"], correct:1},
+      {q:"Which ancient civilization built the pyramids of Giza?", choices:["Romans","Greeks","Egyptians","Persians"], correct:2},
+      {q:"The Titanic sank in which year?", choices:["1905","1912","1920","1898"], correct:1},
+      {q:"Who led the American civil rights movement and gave the 'I Have a Dream' speech?", choices:["Malcolm X","Martin Luther King Jr.","Rosa Parks","Frederick Douglass"], correct:1},
+      {q:"True or False: World War II ended in 1945.", choices:["True","False"], correct:0},
+      {q:"True or False: The Titanic sank in 1912.", choices:["True","False"], correct:0},
+      {q:"True or False: The Berlin Wall fell in 1975.", choices:["True","False"], correct:1},
+      {q:"True or False: George Washington was the second President of the United States.", choices:["True","False"], correct:1},
+      {q:"True or False: The Great Wall of China was built to defend against invasions.", choices:["True","False"], correct:0},
     ],
     sci: [
       ["What is the chemical symbol for gold?","Au"],
@@ -492,6 +544,16 @@
       ["What is the name of Earth's only natural satellite?","The Moon"],
       ["What vitamin does the body mainly produce from sunlight exposure?","Vitamin D"],
       ["What do you call the force that resists motion between two surfaces in contact?","Friction"],
+      {q:"What planet is known as the Red Planet?", choices:["Venus","Mars","Jupiter","Saturn"], correct:1},
+      {q:"What is the chemical symbol for gold?", choices:["Gd","Au","Ag","Go"], correct:1},
+      {q:"How many bones are in the adult human body?", choices:["186","206","226","246"], correct:1},
+      {q:"Which gas do humans need to breathe in to survive?", choices:["Carbon dioxide","Nitrogen","Oxygen","Helium"], correct:2},
+      {q:"Which planet is the largest in our solar system?", choices:["Earth","Saturn","Jupiter","Neptune"], correct:2},
+      {q:"True or False: The chemical symbol for gold is Au.", choices:["True","False"], correct:0},
+      {q:"True or False: Water boils at 100 degrees Celsius at sea level.", choices:["True","False"], correct:0},
+      {q:"True or False: The Sun is a planet.", choices:["True","False"], correct:1},
+      {q:"True or False: Humans have 206 bones in their body as adults.", choices:["True","False"], correct:0},
+      {q:"True or False: Mars is known as the Red Planet.", choices:["True","False"], correct:0},
     ],
     ent: [
       ["Who directed the 1975 film Jaws?","Steven Spielberg"],
@@ -524,6 +586,16 @@
       ["Which British band is known for the song Bohemian Rhapsody?","Queen"],
       ["Which Disney film tells the story of a mermaid who longs to be human?","The Little Mermaid"],
       ["Which rock musician is nicknamed 'The Boss', famous for Born to Run?","Bruce Springsteen"],
+      {q:"Which band released the album Abbey Road?", choices:["The Rolling Stones","The Beatles","Queen","Pink Floyd"], correct:1},
+      {q:"Who directed the movie Jaws?", choices:["George Lucas","Steven Spielberg","Martin Scorsese","James Cameron"], correct:1},
+      {q:"What is the name of the wizarding school in Harry Potter?", choices:["Hogwarts","Narnia","Camelot","Azkaban"], correct:0},
+      {q:"Which streaming service produced Stranger Things?", choices:["Hulu","Amazon Prime","Netflix","Disney+"], correct:2},
+      {q:"Who played the Joker in The Dark Knight (2008)?", choices:["Jack Nicholson","Joaquin Phoenix","Heath Ledger","Jared Leto"], correct:2},
+      {q:"True or False: The Beatles were a British rock band.", choices:["True","False"], correct:0},
+      {q:"True or False: Steven Spielberg directed Jaws.", choices:["True","False"], correct:0},
+      {q:"True or False: Frozen is a Pixar film.", choices:["True","False"], correct:1},
+      {q:"True or False: Michael Jackson is known as the King of Pop.", choices:["True","False"], correct:0},
+      {q:"True or False: In Harry Potter, the wizarding school is called Narnia.", choices:["True","False"], correct:1},
     ],
     sport: [
       ["How many players from each team are on the field in a standard soccer match?","11"],
@@ -556,6 +628,16 @@
       ["What sport is Michael Phelps famous for?","Swimming"],
       ["How many periods are in a standard ice hockey game?","3"],
       ["What sport uses terms like 'birdie', 'eagle', and 'bogey'?","Golf"],
+      {q:"How many players are on a soccer team on the field at once?", choices:["9","10","11","12"], correct:2},
+      {q:"In which sport would you perform a slam dunk?", choices:["Volleyball","Basketball","Tennis","Baseball"], correct:1},
+      {q:"How often are the Summer Olympic Games held?", choices:["Every 2 years","Every 3 years","Every 4 years","Every 5 years"], correct:2},
+      {q:"Which country has won the most FIFA World Cup titles?", choices:["Germany","Argentina","Brazil","Italy"], correct:2},
+      {q:"What sport is played at Wimbledon?", choices:["Golf","Tennis","Cricket","Badminton"], correct:1},
+      {q:"True or False: A soccer team has 11 players on the field at once.", choices:["True","False"], correct:0},
+      {q:"True or False: Badminton is played with a shuttlecock.", choices:["True","False"], correct:0},
+      {q:"True or False: The Summer Olympics are held every 4 years.", choices:["True","False"], correct:0},
+      {q:"True or False: In tennis, 'love' means a score of zero.", choices:["True","False"], correct:0},
+      {q:"True or False: A perfect game in ten-pin bowling scores 500 points.", choices:["True","False"], correct:1},
     ],
     art: [
       ["Who painted the Mona Lisa?","Leonardo da Vinci"],
@@ -588,6 +670,16 @@
       ["What is the name of Leonardo da Vinci's famous painting of Jesus and his apostles at a final meal?","The Last Supper"],
       ["Who is known as the father of English literature, author of The Canterbury Tales?","Geoffrey Chaucer"],
       ["Which Russian author wrote War and Peace?","Leo Tolstoy"],
+      {q:"Who painted the Mona Lisa?", choices:["Michelangelo","Leonardo da Vinci","Raphael","Donatello"], correct:1},
+      {q:"Who wrote Romeo and Juliet?", choices:["Charles Dickens","William Shakespeare","Jane Austen","Mark Twain"], correct:1},
+      {q:"Which artist famously cut off part of his own ear?", choices:["Pablo Picasso","Claude Monet","Vincent van Gogh","Salvador Dalí"], correct:2},
+      {q:"Who wrote the Harry Potter series?", choices:["J.R.R. Tolkien","C.S. Lewis","J.K. Rowling","Roald Dahl"], correct:2},
+      {q:"How many lines are in a traditional sonnet?", choices:["10","12","14","16"], correct:2},
+      {q:"True or False: Leonardo da Vinci painted the Mona Lisa.", choices:["True","False"], correct:0},
+      {q:"True or False: A traditional sonnet has 10 lines.", choices:["True","False"], correct:1},
+      {q:"True or False: Vincent van Gogh cut off part of his own ear.", choices:["True","False"], correct:0},
+      {q:"True or False: J.K. Rowling wrote The Chronicles of Narnia.", choices:["True","False"], correct:1},
+      {q:"True or False: William Shakespeare wrote Romeo and Juliet.", choices:["True","False"], correct:0},
     ],
   };
 
@@ -604,6 +696,7 @@
   let gameOver = false;
   let pendingSteps = null;   // die result waiting on a direction choice
   let finalAttempt = false;  // true when the open card is a deciding question
+  let hardMode = false;      // wrong answer on an already-won category costs the wedge
   const AI_CORRECT_CHANCE = 0.6;
 
   function makePlayers(n){
@@ -786,6 +879,13 @@
       : `${numPlayers} players — pass the device around the table`;
   }
 
+  const hardModeBtn = document.getElementById('hardModeBtn');
+  hardModeBtn.addEventListener('click', ()=>{
+    hardMode = !hardMode;
+    hardModeBtn.textContent = hardMode ? 'On' : 'Off';
+    hardModeBtn.classList.toggle('on', hardMode);
+  });
+
   // ---------- turn control switching ----------
   const dieRow = document.getElementById('dieRow');
   const directionRow = document.getElementById('directionRow');
@@ -957,6 +1057,7 @@
   const cardQ = document.getElementById('cardQ');
   const cardA = document.getElementById('cardA');
   const cardAText = document.getElementById('cardAText');
+  const cardChoices = document.getElementById('cardChoices');
   const cardActions = document.getElementById('cardActions');
   const cardSub = document.getElementById('cardSub');
 
@@ -964,16 +1065,39 @@
     currentCat = cat;
     finalAttempt = !!isFinal;
     const aiTurn = players[turn].isAI;
-    const [q,a] = drawQuestion(cat.id);
+    const entry = drawQuestion(cat.id);
+    const isMC = !Array.isArray(entry);
+    const atRisk = hardMode && !finalAttempt && players[turn].wedges.has(cat.id);
+    const riskNote = atRisk ? ' ⚠️ Hard Mode: getting this wrong will cost the wedge!' : '';
+
     cardCat.textContent = cat.name + (finalAttempt ? ' · Deciding Question' : '');
     cardCat.style.background = cat.hex;
+    cardOverlay.classList.add('show');
+
+    if(isMC){
+      cardQ.textContent = entry.q;
+      cardA.style.display = 'none';
+      cardA.classList.remove('show');
+      cardChoices.style.display = 'grid';
+      cardChoices.innerHTML = '';
+      cardActions.innerHTML = '';
+      cardSub.textContent = (finalAttempt
+        ? `${players[turn].name} needs this one to win. Get it right and it's over — get it wrong and it carries to next turn.`
+        : (aiTurn ? 'Watch the computer answer.' : 'Tap the answer you think is correct.')) + riskNote;
+      renderChoices(entry, aiTurn);
+      return;
+    }
+
+    const [q,a] = entry;
+    cardA.style.display = '';
+    cardChoices.style.display = 'none';
+    cardChoices.innerHTML = '';
     cardQ.textContent = q;
     cardAText.textContent = a;
     cardA.classList.remove('show');
-    cardSub.textContent = finalAttempt
+    cardSub.textContent = (finalAttempt
       ? `${players[turn].name} needs this one to win. Get it right and it's over — get it wrong and it carries to next turn.`
-      : (aiTurn ? 'Watch the computer answer.' : 'The other players judge the answer out loud.');
-    cardOverlay.classList.add('show');
+      : (aiTurn ? 'Watch the computer answer.' : 'The other players judge the answer out loud.')) + riskNote;
 
     if(aiTurn){
       cardActions.innerHTML = '<div class="ai-thinking">The computer is thinking…</div>';
@@ -997,6 +1121,48 @@
     });
   }
 
+  function renderChoices(entry, aiTurn){
+    cardChoices.innerHTML = entry.choices
+      .map((c,i)=>`<button class="choice-btn" data-i="${i}">${c}</button>`)
+      .join('');
+    const buttons = Array.from(cardChoices.querySelectorAll('.choice-btn'));
+
+    function revealChoice(selectedIndex, showContinue){
+      buttons.forEach((b,i)=>{
+        b.disabled = true;
+        if(i===entry.correct) b.classList.add('correct');
+        else if(i===selectedIndex) b.classList.add('wrong');
+      });
+      if(showContinue){
+        const correct = selectedIndex === entry.correct;
+        cardActions.innerHTML = '<button class="btn-reveal" id="mcContinueBtn">Continue</button>';
+        document.getElementById('mcContinueBtn').addEventListener('click', ()=>judge(correct));
+      }
+    }
+
+    if(aiTurn){
+      cardActions.innerHTML = '<div class="ai-thinking">The computer is thinking…</div>';
+      setTimeout(()=>{
+        const correct = Math.random() < AI_CORRECT_CHANCE;
+        let selected = entry.correct;
+        if(!correct){
+          const wrongIdxs = entry.choices.map((_,i)=>i).filter(i=>i!==entry.correct);
+          selected = wrongIdxs[Math.floor(Math.random()*wrongIdxs.length)];
+        }
+        revealChoice(selected, false);
+        cardActions.innerHTML = `<div class="ai-thinking">${correct ? 'The computer got it right!' : 'The computer got it wrong.'}</div>`;
+        setTimeout(()=>judge(correct), 900);
+      }, 1000);
+      return;
+    }
+
+    buttons.forEach(b=>{
+      b.addEventListener('click', ()=>{
+        revealChoice(+b.dataset.i, true);
+      });
+    });
+  }
+
   function judge(correct){
     cardOverlay.classList.remove('show');
     if(gameOver) return; // safety guard: never mutate state after the game has ended
@@ -1016,6 +1182,8 @@
 
     if(correct){
       players[turn].wedges.add(currentCat.id);
+    } else if(hardMode && players[turn].wedges.has(currentCat.id)){
+      players[turn].wedges.delete(currentCat.id);
     }
     renderTokens();
     turn = (turn+1) % players.length;
