@@ -57,14 +57,18 @@
     display:flex; align-items:center; gap:10px; margin:14px 0 18px;
     font-size:12.5px; color:var(--cream-dim);
   }
-  .count-btns{display:flex; gap:6px;}
-  .count-btns button{
-    width:30px; height:30px; border-radius:8px; border:1px solid rgba(255,255,255,.2);
-    background:rgba(255,255,255,.06); color:var(--cream); font-family:'Fraunces',serif;
-    font-weight:600; font-size:14px; cursor:pointer; transition:all .15s ease;
+  .stepper{display:flex; align-items:center; gap:5px;}
+  .step-btn{
+    width:26px; height:26px; border-radius:7px; border:1px solid rgba(255,255,255,.24);
+    background:rgba(255,255,255,.08); color:var(--cream); font-family:'Fraunces',serif;
+    font-weight:700; font-size:15px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; transition:all .15s ease;
   }
-  .count-btns button.active{
-    background:var(--gold); color:var(--felt-dark); border-color:var(--gold);
+  .step-btn:hover:not(:disabled){background:rgba(255,255,255,.2);}
+  .step-btn:disabled{opacity:.28; cursor:default;}
+  .step-value{
+    min-width:16px; text-align:center; font-family:'Fraunces',serif;
+    font-weight:700; font-size:14.5px; color:var(--gold);
   }
   .setup-note{
     font-size:11.5px; color:var(--cream-dim); opacity:.8; margin:-10px 0 16px; text-align:center;
@@ -342,15 +346,24 @@
 <body>
 
   <div class="brand">
-    <div class="eyebrow">1–5 Players · One Board · Six Wedges</div>
+    <div class="eyebrow">2–5 Players · Any Mix of Humans & Bots</div>
     <h1>The Questions</h1>
-    <p>Roll the die, choose a direction, and answer whatever category you land on. Once you've collected all six wedges, the others (or the computer) pick your final category — get it right and you win. Play solo against the AI, or pass the device around with friends.</p>
+    <p>Roll the die, choose a direction, and answer whatever category you land on. Once you've collected all six wedges, the others (or the bots) pick your final category — get it right and you win. Mix and match any number of humans and bots, up to five players total.</p>
   </div>
 
   <div class="setup-row">
-    <span>Players:</span>
-    <div class="count-btns" id="countBtns"></div>
-    <span style="opacity:.7;">(1 = solo vs AI)</span>
+    <span>Humans:</span>
+    <div class="stepper" id="humanStepper">
+      <button class="step-btn" id="humanMinus">−</button>
+      <span class="step-value" id="humanValue">2</span>
+      <button class="step-btn" id="humanPlus">+</button>
+    </div>
+    <span style="margin-left:8px;">Bots:</span>
+    <div class="stepper" id="botStepper">
+      <button class="step-btn" id="botMinus">−</button>
+      <span class="step-value" id="botValue">0</span>
+      <button class="step-btn" id="botPlus">+</button>
+    </div>
   </div>
   <div class="setup-note" id="setupNote"></div>
 
@@ -687,7 +700,10 @@
   const boardSpaces = Array.from({length:BOARD_SIZE}, (_,i)=>CATS[i % CATS.length]);
 
   // ---------- state ----------
-  let numPlayers = 2;
+  let numHumans = 2;
+  let numBots = 0;
+  const MIN_TOTAL = 2;
+  const MAX_TOTAL = 5;
   let players = [];
   let turn = 0;
   let pools = {};
@@ -699,18 +715,23 @@
   let hardMode = false;      // wrong answer on an already-won category costs the wedge
   const AI_CORRECT_CHANCE = 0.6;
 
-  function makePlayers(n){
-    if(n===1){
-      return [
-        {name:'Player 1', wedges:new Set(), position:0, isAI:false},
-        {name:'Computer',  wedges:new Set(), position:0, isAI:true},
-      ];
+  function makePlayers(humans, bots){
+    const list = [];
+    for(let i=0;i<humans;i++){
+      list.push({name:'Player '+(i+1), wedges:new Set(), position:0, isAI:false});
     }
-    return Array.from({length:n}, (_,i)=>({name:'Player '+(i+1), wedges:new Set(), position:0, isAI:false}));
+    for(let i=0;i<bots;i++){
+      list.push({name:'Bot '+(i+1), wedges:new Set(), position:0, isAI:true});
+    }
+    return list;
   }
 
   function othersAreAllAI(){
     return players.every((p,i)=> i===turn || p.isAI);
+  }
+
+  function othersHaveHuman(){
+    return players.some((p,i)=> i!==turn && !p.isAI);
   }
 
   function freshPools(){
@@ -859,25 +880,51 @@
   }
 
   // ---------- player-count control ----------
-  const countBtns = document.getElementById('countBtns');
   const setupNote = document.getElementById('setupNote');
-  function buildCountBtns(){
-    countBtns.innerHTML = '';
-    for(let n=1;n<=5;n++){
-      const b = document.createElement('button');
-      b.textContent = n;
-      if(n===numPlayers) b.classList.add('active');
-      b.addEventListener('click', ()=>{
-        if(busy) return;
-        numPlayers = n;
-        startNewGame();
-      });
-      countBtns.appendChild(b);
+  const humanValueEl = document.getElementById('humanValue');
+  const botValueEl = document.getElementById('botValue');
+  const humanMinus = document.getElementById('humanMinus');
+  const humanPlus = document.getElementById('humanPlus');
+  const botMinus = document.getElementById('botMinus');
+  const botPlus = document.getElementById('botPlus');
+
+  function describeSetup(){
+    if(numHumans===0){
+      return `${numBots} bot${numBots===1?'':'s'} — sit back and watch, or add a human player to jump in.`;
     }
-    setupNote.textContent = (numPlayers===1)
-      ? 'Solo mode: you against the computer 🤖'
-      : `${numPlayers} players — pass the device around the table`;
+    if(numBots===0){
+      return `${numHumans} player${numHumans===1?'':'s'} — pass the device around the table`;
+    }
+    return `${numHumans} human${numHumans===1?'':'s'} + ${numBots} bot${numBots===1?'':'s'} — pass the device around on human turns`;
   }
+
+  function refreshStepperUI(){
+    const total = numHumans + numBots;
+    humanValueEl.textContent = numHumans;
+    botValueEl.textContent = numBots;
+    humanMinus.disabled = numHumans<=0 || total<=MIN_TOTAL;
+    humanPlus.disabled  = total>=MAX_TOTAL;
+    botMinus.disabled   = numBots<=0 || total<=MIN_TOTAL;
+    botPlus.disabled    = total>=MAX_TOTAL;
+    setupNote.textContent = describeSetup();
+  }
+
+  humanMinus.addEventListener('click', ()=>{
+    if(busy || numHumans<=0 || numHumans+numBots<=MIN_TOTAL) return;
+    numHumans--; startNewGame();
+  });
+  humanPlus.addEventListener('click', ()=>{
+    if(busy || numHumans+numBots>=MAX_TOTAL) return;
+    numHumans++; startNewGame();
+  });
+  botMinus.addEventListener('click', ()=>{
+    if(busy || numBots<=0 || numHumans+numBots<=MIN_TOTAL) return;
+    numBots--; startNewGame();
+  });
+  botPlus.addEventListener('click', ()=>{
+    if(busy || numHumans+numBots>=MAX_TOTAL) return;
+    numBots++; startNewGame();
+  });
 
   const hardModeBtn = document.getElementById('hardModeBtn');
   hardModeBtn.addEventListener('click', ()=>{
@@ -902,8 +949,13 @@
 
     if(aiTurn){
       if(finalStage){
-        // the other (human) players choose the category; the computer answers once the card opens
-        showFinalControls();
+        if(othersHaveHuman()){
+          // a human present can choose the category; this bot answers once the card opens
+          showFinalControls();
+        } else {
+          // no humans left to choose (e.g. an all-bot game) — a bot picks instead
+          runAIChooseCategory();
+        }
       } else {
         runAIRoll();
       }
@@ -949,13 +1001,15 @@
     });
   }
 
-  // the computer picks a random category for the human's deciding question
+  // a bot picks a random category for the human's deciding question
   function runAIChooseCategory(){
     dieRow.style.display = 'none';
     directionRow.style.display = 'none';
     finalRow.style.display = 'flex';
     finalCats.innerHTML = '';
-    finalPrompt.textContent = `${players[turn].name} has all six wedges! The computer is choosing a category…`;
+    const otherBots = players.filter((p,i)=> p.isAI && i!==turn);
+    const chooserLabel = otherBots.length<=1 ? (otherBots[0]?.name || 'A bot') : 'The bots';
+    finalPrompt.textContent = `${players[turn].name} has all six wedges! ${chooserLabel} ${otherBots.length===1?'is':'are'} choosing a category…`;
     busy = true;
     setTimeout(()=>{
       const cat = CATS[Math.floor(Math.random()*CATS.length)];
@@ -1010,7 +1064,7 @@
     finalRow.style.display = 'none';
     busy = true;
     rollBtn.disabled = true;
-    rollBtn.textContent = 'Computer is rolling…';
+    rollBtn.textContent = `${players[turn].name} is rolling…`;
     setTimeout(()=>{
       dieEl.classList.add('rolling');
       let ticks = 0;
@@ -1083,7 +1137,7 @@
       cardActions.innerHTML = '';
       cardSub.textContent = (finalAttempt
         ? `${players[turn].name} needs this one to win. Get it right and it's over — get it wrong and it carries to next turn.`
-        : (aiTurn ? 'Watch the computer answer.' : 'Tap the answer you think is correct.')) + riskNote;
+        : (aiTurn ? `Watch ${players[turn].name} answer.` : 'Tap the answer you think is correct.')) + riskNote;
       renderChoices(entry, aiTurn);
       return;
     }
@@ -1097,10 +1151,10 @@
     cardA.classList.remove('show');
     cardSub.textContent = (finalAttempt
       ? `${players[turn].name} needs this one to win. Get it right and it's over — get it wrong and it carries to next turn.`
-      : (aiTurn ? 'Watch the computer answer.' : 'The other players judge the answer out loud.')) + riskNote;
+      : (aiTurn ? `Watch ${players[turn].name} answer.` : 'The other players judge the answer out loud.')) + riskNote;
 
     if(aiTurn){
-      cardActions.innerHTML = '<div class="ai-thinking">The computer is thinking…</div>';
+      cardActions.innerHTML = `<div class="ai-thinking">${players[turn].name} is thinking…</div>`;
       setTimeout(()=>{
         cardA.classList.add('show');
         const correct = Math.random() < AI_CORRECT_CHANCE;
@@ -1141,7 +1195,7 @@
     }
 
     if(aiTurn){
-      cardActions.innerHTML = '<div class="ai-thinking">The computer is thinking…</div>';
+      cardActions.innerHTML = `<div class="ai-thinking">${players[turn].name} is thinking…</div>`;
       setTimeout(()=>{
         const correct = Math.random() < AI_CORRECT_CHANCE;
         let selected = entry.correct;
@@ -1150,7 +1204,7 @@
           selected = wrongIdxs[Math.floor(Math.random()*wrongIdxs.length)];
         }
         revealChoice(selected, false);
-        cardActions.innerHTML = `<div class="ai-thinking">${correct ? 'The computer got it right!' : 'The computer got it wrong.'}</div>`;
+        cardActions.innerHTML = `<div class="ai-thinking">${correct ? players[turn].name+' got it right!' : players[turn].name+' got it wrong.'}</div>`;
         setTimeout(()=>judge(correct), 900);
       }, 1000);
       return;
@@ -1212,7 +1266,7 @@
   document.getElementById('playAgainBtn').addEventListener('click', ()=>{
     winOverlay.classList.remove('show');
     const keepNames = players.map(p=>p.name);
-    players = makePlayers(numPlayers).map((p,i)=>({...p, name: keepNames[i] || p.name}));
+    players = makePlayers(numHumans, numBots).map((p,i)=>({...p, name: keepNames[i] || p.name}));
     turn = 0;
     gameOver = false;
     pendingSteps = null;
@@ -1222,14 +1276,14 @@
     beginTurn();
   });
 
-  // ---------- full game (re)start, e.g. on player-count change ----------
+  // ---------- full game (re)start, e.g. on human/bot count change ----------
   function startNewGame(){
-    players = makePlayers(numPlayers);
+    players = makePlayers(numHumans, numBots);
     turn = 0;
     gameOver = false;
     pendingSteps = null;
     freshPools();
-    buildCountBtns();
+    refreshStepperUI();
     buildTokens();
     renderTokens();
     beginTurn();
