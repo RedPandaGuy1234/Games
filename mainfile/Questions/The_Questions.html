@@ -242,13 +242,19 @@
     border-color:var(--gold); background:rgba(212,167,44,.1);
     box-shadow:0 0 0 1px rgba(212,167,44,.35), 0 6px 14px rgba(0,0,0,.25);
   }
-  .player-head{display:flex; align-items:center; gap:8px;}
+  .player-card.finished{opacity:.68;}
+  .player-head{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
   .player-swatch{
     width:11px; height:11px; border-radius:50%; flex:none;
   }
   .ai-tag{
     font-size:9px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
     color:var(--felt-dark); background:var(--gold); padding:2px 6px; border-radius:999px;
+  }
+  .finished-tag{
+    font-size:9.5px; font-weight:700; letter-spacing:.02em;
+    color:var(--gold); background:rgba(212,167,44,.16);
+    padding:2px 7px; border-radius:999px; white-space:nowrap;
   }
   .player-card input{
     background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,.2);
@@ -336,6 +342,21 @@
   .win-card{text-align:center;}
   .win-card h2{font-family:'Fraunces',serif; font-size:28px; margin:6px 0 8px;}
   .win-card p{margin:0 0 20px; font-size:14px; color:#5a5648;}
+  .standings{
+    display:flex; flex-direction:column; gap:7px;
+    margin:0 0 20px; text-align:left;
+  }
+  .standings .row{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 13px; background:rgba(0,0,0,.05); border-radius:9px;
+    font-size:14px; color:var(--ink);
+  }
+  .standings .row .place{
+    font-family:'Fraunces',serif; font-weight:700; font-size:13px;
+    color:#8a7a4a; min-width:32px;
+  }
+  .standings .row.place-1{background:rgba(212,167,44,.18);}
+  .standings .row.place-1 .place{color:#a9801d;}
   .confetti-wrap{position:relative; height:0;}
   .confetti{position:absolute; width:10px; height:16px; top:-30px; opacity:.9; animation:fall 2.6s ease-in forwards;}
   @keyframes fall{ to{ transform:translateY(340px) rotate(400deg); opacity:0; } }
@@ -422,9 +443,10 @@
     <div class="card win-card">
       <div class="confetti-wrap" id="confettiWrap"></div>
       <h2 id="winTitle">🎉 Player 1 wins!</h2>
-      <p>All six wedges collected. Nicely played.</p>
+      <p id="winSub">All six wedges collected. Nicely played.</p>
+      <div class="standings" id="standingsList" style="display:none"></div>
       <div class="card-actions">
-        <button class="btn-correct" id="playAgainBtn">Play Again</button>
+        <button class="btn-correct" id="winActionBtn">Play Again</button>
       </div>
     </div>
   </div>
@@ -713,6 +735,8 @@
   let pendingSteps = null;   // die result waiting on a direction choice
   let finalAttempt = false;  // true when the open card is a deciding question
   let hardMode = false;      // wrong answer on an already-won category costs the wedge
+  let finishedSet = new Set();  // indices of players who have already secured a placement
+  let placementOrder = [];      // player indices in the order they finished (0 = 1st place)
   const AI_CORRECT_CHANCE = 0.6;
 
   function makePlayers(humans, bots){
@@ -724,6 +748,13 @@
       list.push({name:'Bot '+(i+1), wedges:new Set(), position:0, isAI:true});
     }
     return list;
+  }
+
+  function advanceTurn(){
+    for(let i=0;i<players.length;i++){
+      turn = (turn+1) % players.length;
+      if(!finishedSet.has(turn)) return;
+    }
   }
 
   function othersAreAllAI(){
@@ -744,6 +775,11 @@
       [arr[i],arr[j]]=[arr[j],arr[i]];
     }
     return arr;
+  }
+  function ordinal(n){
+    const s = ['th','st','nd','rd'];
+    const v = n % 100;
+    return n + (s[(v-20)%10] || s[v] || s[0]);
   }
   function drawQuestion(catId){
     if(pools[catId].length===0){ pools[catId] = shuffle(BANK[catId].slice()); }
@@ -848,12 +884,15 @@
     playersEl.innerHTML = '';
     players.forEach((p,idx)=>{
       const card = document.createElement('div');
-      card.className = 'player-card' + (idx===turn && !gameOver ? ' active':'');
+      const finished = finishedSet.has(idx);
+      card.className = 'player-card' + (idx===turn && !gameOver && !finished ? ' active':'') + (finished ? ' finished':'');
+      const placeNum = finished ? placementOrder.indexOf(idx)+1 : null;
       card.innerHTML = `
         <div class="player-head">
           <span class="player-swatch" style="background:${RING_COLORS[idx%5]}"></span>
           <input type="text" value="${p.name}" data-idx="${idx}" maxlength="16">
           ${p.isAI ? '<span class="ai-tag">AI</span>' : ''}
+          ${finished ? `<span class="finished-tag">🏁 ${ordinal(placeNum)}</span>` : ''}
         </div>
         <div class="wedge-count-mini">${p.wedges.size}/${CATS.length} collected</div>
         <div class="mini-wedges">
@@ -1223,12 +1262,9 @@
 
     if(finalAttempt){
       if(correct){
-        gameOver = true;
-        busy = true;
-        buildPlayers();
-        showWin(players[turn]);
+        finishPlayer(turn);
       } else {
-        turn = (turn+1) % players.length;
+        advanceTurn();
         beginTurn();
       }
       return;
@@ -1240,19 +1276,22 @@
       players[turn].wedges.delete(currentCat.id);
     }
     renderTokens();
-    turn = (turn+1) % players.length;
+    advanceTurn();
     beginTurn();
   }
 
   // ---------- win overlay ----------
   const winOverlay = document.getElementById('winOverlay');
   const winTitle = document.getElementById('winTitle');
+  const winSub = document.getElementById('winSub');
+  const standingsList = document.getElementById('standingsList');
+  const winActionBtn = document.getElementById('winActionBtn');
   const confettiWrap = document.getElementById('confettiWrap');
-  function showWin(player){
-    winTitle.textContent = `🎉 ${player.name} wins!`;
+
+  function buildConfetti(count){
     confettiWrap.innerHTML = '';
     const colors = CATS.map(c=>c.hex);
-    for(let i=0;i<24;i++){
+    for(let i=0;i<count;i++){
       const el = document.createElement('div');
       el.className = 'confetti';
       el.style.left = (Math.random()*100)+'%';
@@ -1261,20 +1300,82 @@
       el.style.transform = `rotate(${Math.random()*360}deg)`;
       confettiWrap.appendChild(el);
     }
+  }
+
+  // A player just won their deciding question — give them a placement, then either
+  // keep the round going for whoever's left, or wrap up if only one player remains.
+  function finishPlayer(idx){
+    finishedSet.add(idx);
+    placementOrder.push(idx);
+
+    const stillPlaying = players.length - finishedSet.size;
+    if(stillPlaying <= 1){
+      if(stillPlaying === 1){
+        // only one player left active — they're automatically last place, no need to keep playing
+        const lastIdx = players.findIndex((p,i)=>!finishedSet.has(i));
+        finishedSet.add(lastIdx);
+        placementOrder.push(lastIdx);
+      }
+      gameOver = true;
+      busy = true;
+      buildPlayers();
+      showFinalStandings();
+      return;
+    }
+
+    busy = true;
+    buildPlayers();
+    renderTokens();
+    showPlacementNotice(idx, placementOrder.length, stillPlaying);
+  }
+
+  function showPlacementNotice(idx, place, stillPlaying){
+    const player = players[idx];
+    winTitle.textContent = `🏁 ${player.name} finishes ${ordinal(place)}!`;
+    winSub.style.display = '';
+    winSub.textContent = `${stillPlaying} player${stillPlaying===1?'':'s'} still playing for the remaining spots.`;
+    standingsList.style.display = 'none';
+    buildConfetti(14);
+    winActionBtn.textContent = 'Continue';
+    winActionBtn.onclick = ()=>{
+      winOverlay.classList.remove('show');
+      advanceTurn();
+      beginTurn();
+    };
     winOverlay.classList.add('show');
   }
-  document.getElementById('playAgainBtn').addEventListener('click', ()=>{
-    winOverlay.classList.remove('show');
+
+  function showFinalStandings(){
+    const winnerIdx = placementOrder[0];
+    winTitle.textContent = `🎉 ${players[winnerIdx].name} wins!`;
+    winSub.style.display = 'none';
+    standingsList.style.display = 'flex';
+    standingsList.innerHTML = placementOrder.map((idx,i)=>{
+      const place = i+1;
+      return `<div class="row place-${place}"><span class="place">${ordinal(place)}</span><span>${players[idx].name}</span></div>`;
+    }).join('');
+    buildConfetti(24);
+    winActionBtn.textContent = 'Play Again';
+    winActionBtn.onclick = ()=>{
+      winOverlay.classList.remove('show');
+      resetForNewRound();
+    };
+    winOverlay.classList.add('show');
+  }
+
+  function resetForNewRound(){
     const keepNames = players.map(p=>p.name);
     players = makePlayers(numHumans, numBots).map((p,i)=>({...p, name: keepNames[i] || p.name}));
     turn = 0;
     gameOver = false;
     pendingSteps = null;
+    finishedSet = new Set();
+    placementOrder = [];
     freshPools();
     buildTokens();
     renderTokens();
     beginTurn();
-  });
+  }
 
   // ---------- full game (re)start, e.g. on human/bot count change ----------
   function startNewGame(){
@@ -1282,6 +1383,8 @@
     turn = 0;
     gameOver = false;
     pendingSteps = null;
+    finishedSet = new Set();
+    placementOrder = [];
     freshPools();
     refreshStepperUI();
     buildTokens();
