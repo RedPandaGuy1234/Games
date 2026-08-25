@@ -81,6 +81,18 @@
   .mode-toggle.on{
     background:#B4552A; border-color:#B4552A; color:#fff;
   }
+  .start-btn{
+    display:block; margin:4px auto 22px;
+    font-family:'Fraunces',serif; font-weight:600; font-size:16px;
+    color:var(--felt-dark);
+    background:linear-gradient(180deg,#E7C866,var(--gold));
+    border:none; padding:13px 34px; border-radius:999px; cursor:pointer;
+    box-shadow:0 4px 0 #9a7620, 0 8px 16px rgba(0,0,0,.35);
+    letter-spacing:.02em;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .start-btn:active{transform:translateY(3px); box-shadow:0 1px 0 #9a7620, 0 4px 8px rgba(0,0,0,.3);}
+  .start-btn:hover{filter:brightness(1.05);}
 
   .layout{
     width:100%; max-width:1080px;
@@ -297,6 +309,11 @@
   }
   .card-a.show{display:block;}
   .card-a b{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#8a7a4a; margin-bottom:4px;}
+  .card-bot-guess{
+    font-size:14px; background:rgba(91,75,138,.08); border-left:4px solid #5B4B8A;
+    padding:10px 14px; border-radius:6px; margin-bottom:14px;
+  }
+  .card-bot-guess b{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#5B4B8A; margin-bottom:4px;}
   .card-choices{
     display:none;
     grid-template-columns:1fr 1fr;
@@ -400,6 +417,8 @@
     <span style="opacity:.7;">keep playing until everyone but one has finished, instead of stopping at the first winner</span>
   </div>
 
+  <button class="start-btn" id="startGameBtn">Start Game</button>
+
   <div class="layout">
     <div class="board-col">
       <div class="board-wrap" id="boardWrap">
@@ -436,6 +455,7 @@
     <div class="card">
       <div class="card-cat" id="cardCat">Category</div>
       <div class="card-q" id="cardQ">Question goes here</div>
+      <div class="card-bot-guess" id="cardBotGuess" style="display:none"><b id="cardBotGuessLabel">Bot's Answer</b><span id="cardBotGuessText"></span></div>
       <div class="card-a" id="cardA"><b>Answer</b><span id="cardAText"></span></div>
       <div class="card-choices" id="cardChoices"></div>
       <div class="card-actions" id="cardActions">
@@ -793,6 +813,14 @@
     return pools[catId].pop();
   }
 
+  // Picks another open-ended answer from the same category to stand in as a bot's
+  // wrong guess (there's no real distractor list for open-answer questions).
+  function pickWrongGuess(catId, correctAnswer){
+    const candidates = BANK[catId].filter(e => Array.isArray(e) && e[1] !== correctAnswer);
+    if(candidates.length === 0) return "Hmm, not sure — I'll guess.";
+    return candidates[Math.floor(Math.random()*candidates.length)][1];
+  }
+
   // ---------- board (static spaces built once) ----------
   const boardWrap = document.getElementById('boardWrap');
   const tokensLayer = document.getElementById('tokensLayer');
@@ -956,20 +984,25 @@
   }
 
   humanMinus.addEventListener('click', ()=>{
-    if(busy || numHumans<=0 || numHumans+numBots<=MIN_TOTAL) return;
-    numHumans--; startNewGame();
+    if(numHumans<=0 || numHumans+numBots<=MIN_TOTAL) return;
+    numHumans--; refreshStepperUI();
   });
   humanPlus.addEventListener('click', ()=>{
-    if(busy || numHumans+numBots>=MAX_TOTAL) return;
-    numHumans++; startNewGame();
+    if(numHumans+numBots>=MAX_TOTAL) return;
+    numHumans++; refreshStepperUI();
   });
   botMinus.addEventListener('click', ()=>{
-    if(busy || numBots<=0 || numHumans+numBots<=MIN_TOTAL) return;
-    numBots--; startNewGame();
+    if(numBots<=0 || numHumans+numBots<=MIN_TOTAL) return;
+    numBots--; refreshStepperUI();
   });
   botPlus.addEventListener('click', ()=>{
-    if(busy || numHumans+numBots>=MAX_TOTAL) return;
-    numBots++; startNewGame();
+    if(numHumans+numBots>=MAX_TOTAL) return;
+    numBots++; refreshStepperUI();
+  });
+
+  const startGameBtn = document.getElementById('startGameBtn');
+  startGameBtn.addEventListener('click', ()=>{
+    startNewGame();
   });
 
   const hardModeBtn = document.getElementById('hardModeBtn');
@@ -1164,6 +1197,9 @@
   const cardQ = document.getElementById('cardQ');
   const cardA = document.getElementById('cardA');
   const cardAText = document.getElementById('cardAText');
+  const cardBotGuess = document.getElementById('cardBotGuess');
+  const cardBotGuessLabel = document.getElementById('cardBotGuessLabel');
+  const cardBotGuessText = document.getElementById('cardBotGuessText');
   const cardChoices = document.getElementById('cardChoices');
   const cardActions = document.getElementById('cardActions');
   const cardSub = document.getElementById('cardSub');
@@ -1185,6 +1221,7 @@
       cardQ.textContent = entry.q;
       cardA.style.display = 'none';
       cardA.classList.remove('show');
+      cardBotGuess.style.display = 'none';
       cardChoices.style.display = 'grid';
       cardChoices.innerHTML = '';
       cardActions.innerHTML = '';
@@ -1202,6 +1239,7 @@
     cardQ.textContent = q;
     cardAText.textContent = a;
     cardA.classList.remove('show');
+    cardBotGuess.style.display = 'none';
     cardSub.textContent = (finalAttempt
       ? `${players[turn].name} needs this one to win. Get it right and it's over — get it wrong and it carries to next turn.`
       : (aiTurn ? `Watch ${players[turn].name} answer.` : 'The other players judge the answer out loud.')) + riskNote;
@@ -1209,9 +1247,14 @@
     if(aiTurn){
       cardActions.innerHTML = `<div class="ai-thinking">${players[turn].name} is thinking…</div>`;
       setTimeout(()=>{
-        cardA.classList.add('show');
         const correct = Math.random() < AI_CORRECT_CHANCE;
-        setTimeout(()=>judge(correct), 900);
+        const guess = correct ? a : pickWrongGuess(cat.id, a);
+        cardBotGuessLabel.textContent = `${players[turn].name} says`;
+        cardBotGuessText.textContent = guess;
+        cardBotGuess.style.display = 'block';
+        cardA.classList.add('show');
+        cardActions.innerHTML = `<div class="ai-thinking">${correct ? players[turn].name+' got it right!' : players[turn].name+' got it wrong.'}</div>`;
+        setTimeout(()=>judge(correct), 1300);
       }, 1000);
       return;
     }
@@ -1409,7 +1452,14 @@
   }
 
   // ---------- init ----------
-  startNewGame();
+  // Don't start playing automatically — show the setup as a "ready to start"
+  // state and wait for the Start Game button.
+  refreshStepperUI();
+  dieRow.style.display = 'none';
+  directionRow.style.display = 'none';
+  finalRow.style.display = 'none';
+  document.getElementById('turnName').textContent = 'Ready?';
+  document.getElementById('turnAction').textContent = 'press Start Game to begin';
 })();
 </script>
 </body>
