@@ -394,6 +394,12 @@
     <span style="opacity:.7;">miss a category you've already won and you lose that wedge</span>
   </div>
 
+  <div class="setup-row">
+    <span>Play to Last Place:</span>
+    <button class="mode-toggle on" id="continueModeBtn">On</button>
+    <span style="opacity:.7;">keep playing until everyone but one has finished, instead of stopping at the first winner</span>
+  </div>
+
   <div class="layout">
     <div class="board-col">
       <div class="board-wrap" id="boardWrap">
@@ -735,6 +741,7 @@
   let pendingSteps = null;   // die result waiting on a direction choice
   let finalAttempt = false;  // true when the open card is a deciding question
   let hardMode = false;      // wrong answer on an already-won category costs the wedge
+  let continueUntilLastPlace = true;  // keep playing until only one player is left unfinished
   let finishedSet = new Set();  // indices of players who have already secured a placement
   let placementOrder = [];      // player indices in the order they finished (0 = 1st place)
   const AI_CORRECT_CHANCE = 0.6;
@@ -970,6 +977,13 @@
     hardMode = !hardMode;
     hardModeBtn.textContent = hardMode ? 'On' : 'Off';
     hardModeBtn.classList.toggle('on', hardMode);
+  });
+
+  const continueModeBtn = document.getElementById('continueModeBtn');
+  continueModeBtn.addEventListener('click', ()=>{
+    continueUntilLastPlace = !continueUntilLastPlace;
+    continueModeBtn.textContent = continueUntilLastPlace ? 'On' : 'Off';
+    continueModeBtn.classList.toggle('on', continueUntilLastPlace);
   });
 
   // ---------- turn control switching ----------
@@ -1309,8 +1323,10 @@
     placementOrder.push(idx);
 
     const stillPlaying = players.length - finishedSet.size;
-    if(stillPlaying <= 1){
-      if(stillPlaying === 1){
+    const endNow = !continueUntilLastPlace || stillPlaying <= 1;
+
+    if(endNow){
+      if(continueUntilLastPlace && stillPlaying === 1){
         // only one player left active — they're automatically last place, no need to keep playing
         const lastIdx = players.findIndex((p,i)=>!finishedSet.has(i));
         finishedSet.add(lastIdx);
