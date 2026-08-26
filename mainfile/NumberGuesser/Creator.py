@@ -1,8 +1,12 @@
 Number = 0
 Low_Bound = 0
 High_Bound = 0
-def Set_Bounds(Bound):  
-  Bound = input("Hi! Please say the lower part of the range for creating my number!")
-  if Bound.isdigit():
-    print("That is correct!")
-  else:
+def Set_Bounds(Bound): 
+  is_Correct = False 
+  while not is_Correct:
+    Bound = input("Hi! Please say the lower part of the range for creating my number!")
+    if Bound.isdigit():
+      print("That is correct!")
+      is_Correct = True
+    else:
+      print("Please try again")
