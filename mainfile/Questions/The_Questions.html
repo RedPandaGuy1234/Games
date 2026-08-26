@@ -706,7 +706,6 @@
       ["Which artist famously cut off part of his own ear?","Vincent van Gogh"],
       ["What is the study of the origin of words called?","Etymology"],
       ["Who wrote the Harry Potter book series?","J.K. Rowling"],
-      ["Who wrote the Hunger Games book series?","Suzanne Collins"],
       ["Salvador Dalí is closely associated with which art movement?","Surrealism"],
       ["How many lines are in a traditional sonnet?","14"],
       ["Who sculpted the famous statue of David?","Michelangelo"],
@@ -746,7 +745,13 @@
   };
 
   const BOARD_SIZE = 36; // six full cycles of the six categories
-  const boardSpaces = Array.from({length:BOARD_SIZE}, (_,i)=>CATS[i % CATS.length]);
+  let boardSpaces = [];
+  function randomizeBoardSpaces(){
+    const repeats = BOARD_SIZE / CATS.length;
+    const seq = [];
+    CATS.forEach(c=>{ for(let k=0;k<repeats;k++) seq.push(c); });
+    boardSpaces = shuffle(seq);
+  }
 
   // ---------- state ----------
   let numHumans = 2;
@@ -834,17 +839,26 @@
   }
   function buildBoardSpaces(){
     for(let i=0;i<BOARD_SIZE;i++){
-      const cat = boardSpaces[i];
       const p = polar(i, RADIUS);
       const el = document.createElement('div');
       el.className = 'board-space';
       el.style.left = p.x+'px';
       el.style.top = p.y+'px';
+      boardWrap.appendChild(el);
+      boardSpaceEls.push(el);
+    }
+    applyBoardSpaces();
+  }
+  function applyBoardSpaces(){
+    for(let i=0;i<BOARD_SIZE;i++){
+      const cat = boardSpaces[i];
+      const el = boardSpaceEls[i];
       el.style.background = cat.hex;
       el.textContent = cat.abbr;
-      boardWrap.appendChild(el);
     }
   }
+  const boardSpaceEls = [];
+  randomizeBoardSpaces();
   buildBoardSpaces();
 
   // legend
@@ -1432,6 +1446,8 @@
     finishedSet = new Set();
     placementOrder = [];
     freshPools();
+    randomizeBoardSpaces();
+    applyBoardSpaces();
     buildTokens();
     renderTokens();
     beginTurn();
@@ -1446,6 +1462,8 @@
     finishedSet = new Set();
     placementOrder = [];
     freshPools();
+    randomizeBoardSpaces();
+    applyBoardSpaces();
     refreshStepperUI();
     buildTokens();
     renderTokens();
