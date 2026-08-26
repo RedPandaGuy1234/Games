@@ -1,11 +1,12 @@
 # Games
 
-A small collection of games, built and maintained by RedPandaGuy1234. This repo started as a single Python Battleship implementation and has grown into a home for multiple games — some playable in the terminal, some in the browser.
+A small collection of games, built and maintained by RedPandaGuy1234. This repo started as a single Python Battleship implementation and has grown into a home for multiple games — some playable in your terminal, some in your browser.
 
 ## Table of Contents
 - [Games in This Repo](#games-in-this-repo)
   - [Battleship](#battleship)
   - [The Questions](#the-questions)
+  - [Number Guesser](#number-guesser)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Contributing](#contributing)
@@ -52,9 +53,25 @@ cd mainfile/Questions
 open The_Questions.html
 ```
 
+### Number Guesser
+A simple and fun guessing game where you try to guess a randomly selected number within a given range. Perfect for quick entertainment or learning the basics of game logic.
+
+**Features**
+- Simple number guessing mechanics
+- Feedback on each guess (too high, too low, or correct)
+- Adjustable difficulty levels
+- Replay functionality
+
+**Run it**
+```
+cd mainfile/NumberGuesser
+python3 number_guesser.py
+```
+
 ## Requirements
 - **Battleship:** Python 3 or newer, and a terminal
 - **The Questions:** Any modern web browser
+- **Number Guesser:** Python 3 or newer, and a terminal
 
 ## Installation
 1. Clone the repository:
