@@ -11,7 +11,7 @@ def Set_Bounds(Bound, range):
       is_Correct = True
       return Bound
     else:
-      print("This was not a number. Please try again.")
+      print("This was not an integer. Please try again.")
 
 print("Hi!")
 Set_Bounds(Low_Bound, "lower")
