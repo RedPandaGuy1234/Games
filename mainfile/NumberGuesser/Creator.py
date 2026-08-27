@@ -20,4 +20,6 @@ while not is_low_more:
     print("The lower part of the range is greater than the higher one. Please restart.")
     Set_Bounds(Low_Bound, "lower")
     Set_Bounds(High_Bound, "higher")
+  else: 
+    is_low_more = True
 
