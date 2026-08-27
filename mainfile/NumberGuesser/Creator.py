@@ -1,3 +1,5 @@
+import random
+
 Number = 0
 Low_Bound = 0
 High_Bound = 0
@@ -24,4 +26,7 @@ while not is_low_more:
     High_Bound = Set_Bounds(High_Bound, "higher")
   else: 
     is_low_more = True
+Number = random.randint(Low_Bound, High_Bound)
+#This is a test
+print (Number)
 
