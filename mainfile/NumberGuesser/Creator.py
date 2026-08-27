@@ -11,5 +11,5 @@ def Set_Bounds(Bound, range):
     else:
       print("Please try again")
 
-Set_Bounds(Low_Bound, lower)
+Set_Bounds(Low_Bound, "lower")
 
