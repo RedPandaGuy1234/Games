@@ -11,7 +11,7 @@ def Set_Bounds(Bound, range):
     if Bound.isdigit():
       print("Okay!")
       is_Correct = True
-      return int(Bound)         # <- keep this one-line fix
+      return int(Bound)
     else:
       print("This was not an integer. Please try again.")
 
@@ -26,7 +26,6 @@ while not is_low_more:
     High_Bound = Set_Bounds(High_Bound, "higher")
   else: 
     is_low_more = True
-
-# pick the secret number once bounds are valid
+    
 Number = random.randint(Low_Bound, High_Bound)
 print(f"I picked a number between {Low_Bound} and {High_Bound} (hidden).")
