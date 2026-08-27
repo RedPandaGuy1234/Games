@@ -9,6 +9,7 @@ def Set_Bounds(Bound, range):
     if Bound.isdigit():
       print("Okay!")
       is_Correct = True
+      return Bound
     else:
       print("This was not a number. Please try again.")
 
