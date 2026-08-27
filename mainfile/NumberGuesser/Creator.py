@@ -28,4 +28,4 @@ while not is_low_more:
     is_low_more = True
     
 Number = random.randint(Low_Bound, High_Bound)
-print(f"I picked a number between {Low_Bound} and {High_Bound} (hidden).")
+print(f"I picked a number between {Low_Bound} and {High_Bound}.")
