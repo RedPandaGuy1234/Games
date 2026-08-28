@@ -1,6 +1,7 @@
 import random
 
 Number = 0
+guesses = 0
 guess_result = 0
 Low_Bound = 0
 High_Bound = 0
@@ -49,4 +50,4 @@ while not is_low_more:
     
 Number = random.randint(Low_Bound, High_Bound)
 print(f"I picked a number between {Low_Bound} and {High_Bound}.")
-guess_result = guess_number(Number)
+guess_result = guess_number(Number, guesses)
