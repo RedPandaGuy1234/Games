@@ -21,7 +21,7 @@ def guess_number(Number, guessamount):
   guessamount = guessamount + 1
   guessresult = "start"
   Guess = 0
-  while not correct
+  while not correct:
     Guess = input("Please tell me your guess!")
     if Guess.isdigit():
       if Guess = Number:
