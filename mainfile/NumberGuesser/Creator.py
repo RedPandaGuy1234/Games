@@ -16,7 +16,7 @@ def Set_Bounds(Bound, range):
     else:
       print("This was not an integer. Please try again.")
 
-def guess_number(Number, guessamount)
+def guess_number(Number, guessamount):
   correct = False
   guessamount = guessamount + 1
   guessresult = "start"
