@@ -75,7 +75,7 @@ A terminal-based chess game built on top of [python-chess](https://github.com/ni
 **Features**
 - Full standard chess rules via `python-chess` (legal move generation, check/checkmate detection, castling, en passant, promotion)
 - Simple board setup and move-making interface
-- Play moves by typing the original square that the piece was on, and the square it is going to (eg. e2e4).
+- Play moves by typing the original square that the piece was on, and the square it is going to (E.g. e2e4).
 
 **Run it**
 ```
