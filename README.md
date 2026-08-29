@@ -7,6 +7,7 @@ A small collection of games, built and maintained by RedPandaGuy1234. This repo 
   - [Battleship](#battleship)
   - [The Questions](#the-questions)
   - [Number Guesser](#number-guesser)
+  - [Chess](#chess)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Contributing](#contributing)
@@ -68,10 +69,25 @@ cd mainfile/NumberGuesser
 python3 number_guesser.py
 ```
 
+### Chess
+A terminal-based chess game built on top of [python-chess](https://github.com/niklasf/python-chess), handling move legality, board state, and game rules.
+
+**Features**
+- Full standard chess rules via `python-chess` (legal move generation, check/checkmate detection, castling, en passant, promotion)
+- Simple board setup and move-making interface
+- Foundation for future features like a playable CLI loop or AI opponent
+
+**Run it**
+```
+cd mainfile/chess
+python3 board.py
+```
+
 ## Requirements
 - **Battleship:** Python 3 or newer, and a terminal
 - **The Questions:** Any modern web browser
 - **Number Guesser:** Python 3 or newer, and a terminal
+- **Chess:** Python 3 or newer, and the `chess` package (see [Installation](#installation))
 
 ## Installation
 1. Clone the repository:
@@ -82,7 +98,11 @@ python3 number_guesser.py
    ```
    cd Games
    ```
-3. Jump into whichever game you want to play — see [Games in This Repo](#games-in-this-repo) above for how to run each one.
+3. Install dependencies (needed for Chess):
+   ```
+   pip install -r requirements.txt
+   ```
+4. Jump into whichever game you want to play — see [Games in This Repo](#games-in-this-repo) above for how to run each one.
 
 ## Contributing
 Contributions are welcome, whether that's fixes or additions to an existing game or an entirely new game added to the collection. Suggested workflow:
