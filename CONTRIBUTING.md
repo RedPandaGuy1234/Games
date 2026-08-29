@@ -1,3 +1,5 @@
+# Contributing to Games
+
 Contributions are welcome, whether that's fixes or additions to an existing game or an entirely new game added to the collection. Suggested workflow:
 1. Fork the repo
 2. Commit changes to your fork
