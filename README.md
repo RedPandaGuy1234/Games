@@ -8,6 +8,7 @@ A small collection of games, built by me. This repo started as a single Python B
   - [The Questions](#the-questions)
   - [Number Guesser](#number-guesser)
   - [Chess](#chess)
+  - [Reaction Test](#reaction-test)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Contributing](#contributing)
@@ -26,10 +27,9 @@ A classic Battleship implementation playable in your terminal, with a bot and lo
 - Coordinate-based input (e.g., A5) with input validation
 
 **Run it**
-```
-cd mainfile/Battleship
-python3 Set_Up_Ships.py
-```
+
+    cd mainfile/Battleship
+    python3 Set_Up_Ships.py
 
 **Gameplay basics**
 - Board coordinates use letters for rows and numbers for columns (e.g., A1, B7).
@@ -49,10 +49,9 @@ A browser-based trivia game for 1–5 players (or solo against a computer oppone
 - Optional Hard Mode: missing a question in a category you've already won costs you that wedge
 
 **Play it**
-```
-cd mainfile/Questions
-open The_Questions.html
-```
+
+    cd mainfile/Questions
+    open The_Questions.html
 
 ### Number Guesser
 A simple and fun guessing game where you try to guess a randomly selected number within a given range. Perfect for quick entertainment or learning the basics of game logic.
@@ -64,10 +63,9 @@ A simple and fun guessing game where you try to guess a randomly selected number
 - Replay functionality
 
 **Run it**
-```
-cd mainfile/NumberGuesser
-python3 number_guesser.py
-```
+
+    cd mainfile/NumberGuesser
+    python3 number_guesser.py
 
 ### Chess
 A terminal-based chess game built from [python-chess](https://github.com/niklasf/python-chess) (A huge thanks to them), handling move legality, board state, and game rules.
@@ -78,34 +76,47 @@ A terminal-based chess game built from [python-chess](https://github.com/niklasf
 - Play moves by typing the original square that the piece was on, and the square it is going to (E.g. e2e4).
 
 **Run it**
-```
-cd mainfile/chess
-python3 board.py
-```
+
+    cd mainfile/chess
+    python3 board.py
+
+### Reaction Test
+A quick terminal game that measures how fast your reflexes are. It waits a random amount of time between 1 and 60 seconds, tells you to go, then reports how long it took you to press Enter.
+
+**Features**
+- Random wait time before the "NOW!" prompt appears
+- Measures and reports your reaction time in seconds
+- Simple, single-run terminal gameplay
+
+**Run it**
+
+    cd mainfile/Reactiontest
+    python3 Reaction_test
 
 ## Requirements
 - **Battleship:** Python 3 or newer, and a terminal
 - **The Questions:** Any modern web browser
 - **Number Guesser:** Python 3 or newer, and a terminal
 - **Chess:** Python 3 or newer, and the `chess` package (see [Installation](#installation))
+- **Reaction Test:** Python 3 or newer, and a terminal
 
 ## Installation
 1. Clone the repository:
-   ```
-   git clone https://github.com/RedPandaGuy1234/Games
-   ```
+
+       git clone https://github.com/RedPandaGuy1234/Games
+
 2. Enter the project directory:
-   ```
-   cd Games
-   ```
+
+       cd Games
+
 3. Install dependencies (needed for Chess):
-   ```
-   pip install -r requirements.txt
-   ```
+
+       pip install -r requirements.txt
+
 4. Regularly update it:
-   ```
-   git pull
-   ```
+
+       git pull
+
 5. Jump into whichever game you want to play — see [Games in This Repo](#games-in-this-repo) above for how to run each one.
 
 ## Contributing
