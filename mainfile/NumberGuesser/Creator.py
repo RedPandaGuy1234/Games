@@ -50,4 +50,4 @@ while not is_low_more:
     
 Number = random.randint(Low_Bound, High_Bound)
 print(f"I picked a number between {Low_Bound} and {High_Bound}.")
-guess_result = guess_number(Number, guesses)
+guess_result, guesses = guess_number(Number, guesses)
