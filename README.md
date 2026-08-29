@@ -102,7 +102,11 @@ python3 board.py
    ```
    pip install -r requirements.txt
    ```
-4. Jump into whichever game you want to play — see [Games in This Repo](#games-in-this-repo) above for how to run each one.
+4. Regularly update it:
+   ```
+   git pull
+   ```
+5. Jump into whichever game you want to play — see [Games in This Repo](#games-in-this-repo) above for how to run each one.
 
 ## Contributing
 Contributions are welcome, whether that's fixes or additions to an existing game or an entirely new game added to the collection. Suggested workflow:
