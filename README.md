@@ -1,6 +1,6 @@
 # Games
 
-A small collection of games, built and maintained by RedPandaGuy1234. This repo started as a single Python Battleship implementation and has grown into a home for multiple games — some playable in your terminal, some in your browser.
+A small collection of games, built by me. This repo started as a single Python Battleship implementation and has grown into a home for multiple games — some playable in your terminal, some in your browser.
 
 ## Table of Contents
 - [Games in This Repo](#games-in-this-repo)
