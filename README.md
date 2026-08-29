@@ -109,7 +109,7 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
 
        cd Games
 
-3. Install dependencies (needed for Chess):
+3. Install dependencies (needed for Chess and or running black for contributing):
 
        pip install -r requirements.txt
 
