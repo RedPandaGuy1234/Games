@@ -1,4 +1,5 @@
 import random
+import sys
 
 Number = 0
 guesses = 0
@@ -62,3 +63,4 @@ if guesses > 1:
     print(f"Congratulations! You got my number, {Number}, in {guesses}!")
 elif guesses == 1:
     print(f"Congratulations! You got my number, {Number}, in only one guess!")
+sys.exit()
