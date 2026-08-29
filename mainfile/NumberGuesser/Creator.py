@@ -59,7 +59,7 @@ Number = random.randint(Low_Bound, High_Bound)
 print(f"I picked a number between {Low_Bound} and {High_Bound}.")
 guesses = guess_number(Number, guesses)
 
-if guessest > 1:
+if guesses > 1:
     print(f"Congratulations! You got my number, {Number}, in {guesses}!")
 elif guesses == 1:
     print(f"Congratulations! You got my number, {Number}, in only one guess!")
