@@ -70,7 +70,7 @@ python3 number_guesser.py
 ```
 
 ### Chess
-A terminal-based chess game built on top of [python-chess](https://github.com/niklasf/python-chess), handling move legality, board state, and game rules.
+A terminal-based chess game built from [python-chess](https://github.com/niklasf/python-chess) (A huge thanks to them), handling move legality, board state, and game rules.
 
 **Features**
 - Full standard chess rules via `python-chess` (legal move generation, check/checkmate detection, castling, en passant, promotion)
