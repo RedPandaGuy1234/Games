@@ -12,7 +12,9 @@ is_low_more = False
 def Set_Bounds(Bound, range):
     is_Correct = False
     while not is_Correct:
-        Bound = input(f"Please say the {range} part of the range for creating my number!")
+        Bound = input(
+            f"Please say the {range} part of the range for creating my number!"
+        )
         if Bound.isdigit():
             print("Okay!")
             is_Correct = True
@@ -49,7 +51,9 @@ High_Bound = Set_Bounds(High_Bound, "higher")
 is_low_more = False
 while not is_low_more:
     if Low_Bound >= High_Bound:
-        print("The lower part of the range is greater or equal to the higher one. Please restart.")
+        print(
+            "The lower part of the range is greater or equal to the higher one. Please restart."
+        )
         Low_Bound = Set_Bounds(Low_Bound, "lower")
         High_Bound = Set_Bounds(High_Bound, "higher")
     else:
