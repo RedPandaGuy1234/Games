@@ -119,16 +119,6 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
 
 5. Jump into whichever game you want to play — see [Games in This Repo](#games-in-this-repo) above for how to run each one.
 
-## Contributing
-Contributions are welcome, whether that's fixes or additions to an existing game or an entirely new game added to the collection. Suggested workflow:
-1. Fork the repo
-2. Commit changes to your fork
-3. Open a pull request
-
-If you want to run Black, run ```black .```
-
-Please include tests where applicable, follow the existing code style for whichever game you're touching, and keep each game's files self-contained within its own folder.
-
 ## License
 This project is released under the GPL-3.0 License. See [LICENSE](LICENSE) for details. This license applies repo-wide unless a specific game's folder states otherwise.
 
