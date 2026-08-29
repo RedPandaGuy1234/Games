@@ -23,10 +23,10 @@ def Set_Bounds(Bound, range):
 
 def guess_number(Number, guessamount):
     correct = False
-    guessamount = guessamount + 1
     guessresult = "start"
     Guess = 0
     while not correct:
+        guessamount = guessamount + 1
         Guess = input("Please tell me your guess!")
         if Guess.isdigit():
             Guess = int(Guess)
