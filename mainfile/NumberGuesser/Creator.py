@@ -27,6 +27,7 @@ def guess_number(Number, guessamount):
     if Guess.isdigit():
       if Guess == Number:
         guessresult = "Correct"
+        correct = True
         return guessresult, guessamount
       elif Guess > Number:
         guessresult = "High"
