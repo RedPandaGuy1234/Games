@@ -132,6 +132,9 @@ Please include tests where applicable, follow the existing code style for whiche
 ## License
 This project is released under the GPL-3.0 License. See [LICENSE](LICENSE) for details. This license applies repo-wide unless a specific game's folder states otherwise.
 
+## Credits
+This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess) and 
+
 ## Contact
 Maintainer: RedPandaGuy1234
 GitHub: https://github.com/RedPandaGuy1234
