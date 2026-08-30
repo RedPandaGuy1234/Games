@@ -53,7 +53,9 @@ def evaluate_board(board: chess.Board) -> int:
     return score
 
 
-def minimax(board: chess.Board, depth: int, alpha: float, beta: float, maximizing: bool) -> float:
+def minimax(
+    board: chess.Board, depth: int, alpha: float, beta: float, maximizing: bool
+) -> float:
     """Look `depth` moves ahead, assuming both sides play their best move.
 
     `maximizing` is True when it's White's turn to move (White wants a high
@@ -119,7 +121,9 @@ def play_game():
     bot_color = None
     play_bot = input("Play against the bot? (y/n): ").strip().lower()
     if play_bot == "y":
-        color_choice = input("Should the bot play White or Black? (w/b): ").strip().lower()
+        color_choice = (
+            input("Should the bot play White or Black? (w/b): ").strip().lower()
+        )
         bot_color = chess.WHITE if color_choice == "w" else chess.BLACK
 
     while not board.is_game_over(claim_draw=True):
