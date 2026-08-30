@@ -68,17 +68,20 @@ A simple and fun guessing game where you try to guess a randomly selected number
     python3 number_guesser.py
 
 ### Chess
-A terminal-based chess game built from [python-chess](https://github.com/niklasf/python-chess) (A huge thanks to them), handling move legality, board state, and game rules.
+A terminal-based chess game built from [python-chess](https://github.com/niklasf/python-chess) (A huge thanks to them), handling move legality, board state, and game rules. Includes an optional computer opponent powered by minimax search with alpha-beta pruning.
 
 **Features**
 - Full standard chess rules via `python-chess` (legal move generation, check/checkmate detection, castling, en passant, promotion)
 - Simple board setup and move-making interface
 - Play moves by typing the original square that the piece was on, and the square it is going to (E.g. e2e4).
+- Optional bot opponent: choose to play against the computer and pick which color it plays. The bot evaluates positions by material and searches a few moves ahead (minimax with alpha-beta pruning) to choose its move.
 
 **Run it**
 
     cd mainfile/chess
     python3 board.py
+
+When you start the game, you'll be asked whether you want to play against the bot, and if so, whether the bot should play White or Black.
 
 ### Reaction Test
 A quick terminal game that measures how fast your reflexes are. It waits a random amount of time between 1 and 60 seconds, tells you to go, then reports how long it took you to press Enter.
@@ -109,7 +112,7 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
 
        cd Games
 
-3. Install dependencies (needed for Chess and or running black for contributing):
+3. Install dependencies (needed for Chess):
 
        pip install -r requirements.txt
 
@@ -118,6 +121,16 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
        git pull
 
 5. Jump into whichever game you want to play — see [Games in This Repo](#games-in-this-repo) above for how to run each one.
+
+## Contributing
+Contributions are welcome, whether that's fixes or additions to an existing game or an entirely new game added to the collection. Suggested workflow:
+1. Fork the repo
+2. Commit changes to your fork
+3. Open a pull request
+
+If you want to run Black, run ```black .```
+
+Please include tests where applicable, follow the existing code style for whichever game you're touching, and keep each game's files self-contained within its own folder.
 
 ## License
 This project is released under the GPL-3.0 License. See [LICENSE](LICENSE) for details. This license applies repo-wide unless a specific game's folder states otherwise.
