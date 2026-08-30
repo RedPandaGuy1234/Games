@@ -7,4 +7,7 @@ Contributions are welcome, whether that's fixes or additions to an existing game
 
 If you want to run Black, run ```black .``` in your terminal, and then run ```git push```
 
+There are many different ways to contribute:
+1. Add new questions to The Questions
+
 Please include tests where applicable, follow the existing code style for whichever game you're touching, and keep each game's files self-contained within its own folder.
