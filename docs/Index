@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --felt:#16302A;
+    --felt-dark:#0E211B;
+    --felt-light:#1E3E35;
+    --cream:#F3EAD7;
+    --cream-dim:#E4D8BF;
+    --gold:#D4A72C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 800px at 50% -10%, var(--felt-light), var(--felt) 55%, var(--felt-dark) 100%);
+    color:var(--cream);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:40px 16px 60px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .eyebrow{font-size:11px; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); opacity:.85;}
+  h1{font-family:'Fraunces',serif; font-weight:700; font-size:clamp(34px,6vw,54px); margin:6px 0 8px;}
+  .sub{color:var(--cream-dim); font-size:14px; margin:0 0 40px; text-align:center; max-width:480px;}
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:18px; width:100%; max-width:920px;
+  }
+  .card{
+    display:block; text-decoration:none; color:var(--cream);
+    background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.08);
+    border-radius:16px; padding:22px 20px; transition:transform .15s ease, border-color .15s ease;
+  }
+  .card:hover{transform:translateY(-3px); border-color:var(--gold);}
+  .card h2{font-family:'Fraunces',serif; font-weight:600; font-size:20px; margin:0 0 8px;}
+  .card p{font-size:13px; color:var(--cream-dim); margin:0; line-height:1.5;}
+  .badge{
+    display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--felt-dark); background:var(--gold);
+    padding:3px 9px; border-radius:999px; margin-bottom:10px;
+  }
+  footer{margin-top:44px; font-size:11.5px; color:rgba(243,234,215,.4); text-align:center;}
+</style>
+</head>
+<body>
+
+  <div class="eyebrow">A Small Collection</div>
+  <h1>Games</h1>
+  <p class="sub">Pick a game below. Everything runs right in your browser — no installs needed.</p>
+
+  <div class="grid">
+    <a class="card" href="battleship.html">
+      <span class="badge">2 Player</span>
+      <h2>Battleship</h2>
+      <p>Place your fleet, then trade shots with a bot opponent that hunts down your ships once it lands a hit.</p>
+    </a>
+    <a class="card" href="Questions/The_Questions.html">
+      <span class="badge">1–5 Players</span>
+      <h2>The Questions</h2>
+      <p>A wedge-collecting trivia game across six categories, with bots, hard mode, and a deciding final question.</p>
+    </a>
+    <a class="card" href="numberguesser.html">
+      <span class="badge">Solo</span>
+      <h2>Number Guesser</h2>
+      <p>Set a range, then try to guess the hidden number in as few tries as possible.</p>
+    </a>
+    <a class="card" href="reactiontest.html">
+      <span class="badge">Solo</span>
+      <h2>Reaction Test</h2>
+      <p>Wait for the signal, then click as fast as you can. How sharp are your reflexes?</p>
+    </a>
+    <a class="card" href="chess.html">
+      <span class="badge">Coming Soon</span>
+      <h2>Chess</h2>
+      <p>Full chess rules with a bot opponent at two difficulty levels, no external engine required.</p>
+    </a>
+  </div>
+
+  <footer>Built by RedPandaGuy1234</footer>
+</body>
+</html>
