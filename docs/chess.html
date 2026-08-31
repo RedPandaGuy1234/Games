@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chess</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root{
+    --felt:#16302A;
+    --felt-dark:#0E211B;
+    --felt-light:#1E3E35;
+    --cream:#F3EAD7;
+    --cream-dim:#E4D8BF;
+    --gold:#D4A72C;
+    --sq-light:#EFE3C8;
+    --sq-dark:#7C9473;
+    --sq-select:#D4A72C;
+    --sq-target:#4FD1C5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 800px at 50% -10%, var(--felt-light), var(--felt) 55%, var(--felt-dark) 100%);
+    color:var(--cream);
+    font-family:'Inter',Arial,sans-serif;
+    min-height:100vh;
+    padding:26px 16px 56px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .back-link{align-self:flex-start; color:var(--cream-dim); font-size:13px; text-decoration:none; margin-bottom:18px;}
+  .back-link:hover{color:var(--gold);}
+  h1{font-weight:700; font-size:clamp(26px,5vw,38px); margin:0 0 6px;}
+  .sub{color:var(--cream-dim); font-size:13.5px; margin:0 0 20px; text-align:center; max-width:460px;}
+  .message{
+    font-size:15px; line-height:1.5; text-align:center; max-width:600px;
+    background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.08);
+    border-radius:10px; padding:12px 16px; margin-bottom:18px; min-height:22px;
+  }
+  .setup-panel{
+    display:flex; flex-direction:column; align-items:center; gap:16px;
+    background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.08);
+    border-radius:14px; padding:22px 24px; margin-bottom:20px; max-width:420px; width:100%;
+  }
+  .setup-row{display:flex; flex-direction:column; align-items:center; gap:8px;}
+  .setup-row .label{font-size:12.5px; color:var(--cream-dim); letter-spacing:.03em; text-transform:uppercase;}
+  .btn-group{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;}
+  .opt-btn{
+    font-family:inherit; font-weight:600; font-size:13px;
+    color:var(--cream); background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.2); padding:8px 16px;
+    border-radius:999px; cursor:pointer; transition:all .15s ease;
+  }
+  .opt-btn.active{background:var(--gold); color:var(--felt-dark); border-color:var(--gold);}
+  .controls{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;}
+  button.action{
+    font-family:inherit; font-weight:700; font-size:14px;
+    color:var(--felt-dark); background:linear-gradient(180deg,#E7C866,var(--gold));
+    border:none; padding:11px 22px; border-radius:999px; cursor:pointer;
+    box-shadow:0 3px 0 #9a7620, 0 6px 12px rgba(0,0,0,.3);
+  }
+  button.action:active{transform:translateY(2px); box-shadow:0 1px 0 #9a7620, 0 3px 6px rgba(0,0,0,.3);}
+  button.action:disabled{opacity:.45; cursor:default;}
+  button.secondary{
+    font-family:inherit; font-weight:700; font-size:13.5px;
+    color:var(--cream); background:rgba(255,255,255,.08);
+    border:none; padding:10px 18px; border-radius:999px; cursor:pointer;
+    box-shadow:0 3px 0 rgba(0,0,0,.3), 0 6px 12px rgba(0,0,0,.25);
+  }
+  button.secondary:active{transform:translateY(2px);}
+  button.secondary:disabled{opacity:.4; cursor:default;}
+  .board{
+    display:grid; grid-template-columns:repeat(8,44px); grid-template-rows:repeat(8,44px);
+    border:2px solid rgba(0,0,0,.35); border-radius:6px; overflow:hidden;
+    box-shadow:0 10px 26px rgba(0,0,0,.4);
+  }
+  .square{
+    width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+    font-size:28px; cursor:pointer; position:relative; user-select:none;
+  }
+  .square.light{background:var(--sq-light);}
+  .square.dark{background:var(--sq-dark);}
+  .square.selected::after{
+    content:''; position:absolute; inset:2px; border-radius:4px;
+    box-shadow:inset 0 0 0 3px var(--sq-select);
+  }
+  .square.target::after{
+    content:''; position:absolute; width:14px; height:14px; border-radius:50%;
+    background:rgba(79,209,197,.7);
+  }
+  .square.target.has-piece::after{
+    content:''; position:absolute; inset:2px; width:auto; height:auto; border-radius:4px; background:none;
+    box-shadow:inset 0 0 0 3px var(--sq-target);
+  }
+</style>
+</head>
+<body>
+
+  <a class="back-link" href="index.html">← Back to games</a>
+  <h1>Chess</h1>
+  <p class="sub">Full chess rules, no external engine. Pawns always promote to a queen.</p>
+
+  <div class="message" id="message">Loading the game engine…</div>
+
+  <div class="setup-panel" id="setupPanel">
+    <div class="setup-row">
+      <div class="label">Game Mode</div>
+      <div class="btn-group" id="modeGroup">
+        <button class="opt-btn active" data-value="bot">Vs Bot</button>
+        <button class="opt-btn" data-value="human">Two Players</button>
+      </div>
+    </div>
+    <div class="setup-row" id="botColorRow">
+      <div class="label">Bot Plays</div>
+      <div class="btn-group" id="botColorGroup">
+        <button class="opt-btn" data-value="white">White</button>
+        <button class="opt-btn" data-value="black">Black</button>
+        <button class="opt-btn active" data-value="random">Random</button>
+      </div>
+    </div>
+    <div class="setup-row" id="difficultyRow">
+      <div class="label">Difficulty</div>
+      <div class="btn-group" id="difficultyGroup">
+        <button class="opt-btn active" data-value="easy">Easy</button>
+        <button class="opt-btn" data-value="normal">Normal</button>
+        <button class="opt-btn" data-value="hard">Hard</button>
+      </div>
+    </div>
+    <button class="action" id="startBtn" disabled>Start Game</button>
+  </div>
+
+  <div class="controls" id="gameControls" style="display:none">
+    <button class="secondary" id="offerDrawBtn">Offer Draw</button>
+    <button class="secondary" id="resignBtn">Resign</button>
+    <button class="secondary" id="newGameBtn">New Game</button>
+  </div>
+
+  <div class="board" id="board" style="display:none"></div>
+
+<script>
+const PYTHON_SOURCE = `
+import chess
+import random
+import json
+
+PIECE_VALUES = {
+    chess.PAWN: 100,
+    chess.KNIGHT: 320,
+    chess.BISHOP: 330,
+    chess.ROOK: 500,
+    chess.QUEEN: 900,
+    chess.KING: 0,
+}
+
+PIECE_UNICODE = {
+    (chess.PAWN, chess.WHITE): "\u2659", (chess.KNIGHT, chess.WHITE): "\u2658",
+    (chess.BISHOP, chess.WHITE): "\u2657", (chess.ROOK, chess.WHITE): "\u2656",
+    (chess.QUEEN, chess.WHITE): "\u2655", (chess.KING, chess.WHITE): "\u2654",
+    (chess.PAWN, chess.BLACK): "\u265F", (chess.KNIGHT, chess.BLACK): "\u265E",
+    (chess.BISHOP, chess.BLACK): "\u265D", (chess.ROOK, chess.BLACK): "\u265C",
+    (chess.QUEEN, chess.BLACK): "\u265B", (chess.KING, chess.BLACK): "\u265A",
+}
+
+DIFFICULTY_SETTINGS = {
+    "easy":   {"depth": 1, "blunder_chance": 0.45},
+    "normal": {"depth": 2, "blunder_chance": 0.15},
+    "hard":   {"depth": 3, "blunder_chance": 0.0},
+}
+
+state = {
+    "board": chess.Board(),
+    "mode": None,
+    "bot_color": None,
+    "difficulty": None,
+    "selected_square": None,
+    "legal_targets": [],
+    "message": "Choose your settings and start the game.",
+    "game_over": False,
+}
+
+def evaluate_board(board):
+    if board.is_checkmate():
+        return -100000 if board.turn == chess.WHITE else 100000
+    value = 0
+    for piece_type in PIECE_VALUES:
+        value += len(board.pieces(piece_type, chess.WHITE)) * PIECE_VALUES[piece_type]
+        value -= len(board.pieces(piece_type, chess.BLACK)) * PIECE_VALUES[piece_type]
+    return value
+
+def minimax(board, depth, alpha, beta, maximizing):
+    if depth == 0 or board.is_game_over():
+        return evaluate_board(board)
+    if maximizing:
+        best = -float("inf")
+        for move in board.legal_moves:
+            board.push(move)
+            best = max(best, minimax(board, depth - 1, alpha, beta, False))
+            board.pop()
+            alpha = max(alpha, best)
+            if beta <= alpha:
+                break
+        return best
+    best = float("inf")
+    for move in board.legal_moves:
+        board.push(move)
+        best = min(best, minimax(board, depth - 1, alpha, beta, True))
+        board.pop()
+        beta = min(beta, best)
+        if beta <= alpha:
+            break
+    return best
+
+def choose_bot_move():
+    board = state["board"]
+    settings = DIFFICULTY_SETTINGS[state["difficulty"]]
+    legal_moves = list(board.legal_moves)
+    if not legal_moves:
+        return None
+    if random.random() < settings["blunder_chance"]:
+        return random.choice(legal_moves)
+    maximizing = board.turn == chess.WHITE
+    best_move = legal_moves[0]
+    best_value = -float("inf") if maximizing else float("inf")
+    for move in legal_moves:
+        board.push(move)
+        value = minimax(board, settings["depth"], -float("inf"), float("inf"), not maximizing)
+        board.pop()
+        value += random.uniform(-15, 15)
+        if maximizing and value > best_value:
+            best_value = value
+            best_move = move
+        elif not maximizing and value < best_value:
+            best_value = value
+            best_move = move
+    return best_move
+
+def check_game_over():
+    board = state["board"]
+    if board.is_game_over(claim_draw=True):
+        state["game_over"] = True
+        if board.is_checkmate():
+            winner = "Black" if board.turn == chess.WHITE else "White"
+            state["message"] = f"Checkmate! {winner} wins."
+        elif board.is_stalemate():
+            state["message"] = "Stalemate! The game is a draw."
+        elif board.is_insufficient_material():
+            state["message"] = "Draw by insufficient material."
+        elif board.can_claim_threefold_repetition():
+            state["message"] = "Draw by threefold repetition."
+        elif board.is_seventyfive_moves():
+            state["message"] = "Draw by the 75-move rule."
+        else:
+            state["message"] = "The game has ended in a draw."
+
+def maybe_play_bot_move():
+    board = state["board"]
+    if state["mode"] == "bot" and not state["game_over"] and board.turn == state["bot_color"]:
+        move = choose_bot_move()
+        if move is not None:
+            board.push(move)
+        check_game_over()
+        if not state["game_over"]:
+            turn_name = "White" if board.turn == chess.WHITE else "Black"
+            check_note = " Check!" if board.is_check() else ""
+            state["message"] = f"{turn_name} to move.{check_note}"
+
+def start_game(mode, bot_color_str, difficulty):
+    state["board"] = chess.Board()
+    state["mode"] = mode
+    state["difficulty"] = difficulty
+    state["selected_square"] = None
+    state["legal_targets"] = []
+    state["game_over"] = False
+    if mode == "bot":
+        if bot_color_str == "white":
+            state["bot_color"] = chess.WHITE
+        elif bot_color_str == "black":
+            state["bot_color"] = chess.BLACK
+        else:
+            state["bot_color"] = random.choice([chess.WHITE, chess.BLACK])
+    else:
+        state["bot_color"] = None
+    state["message"] = "White to move."
+    maybe_play_bot_move()
+    return get_status()
+
+def square_click(square_name):
+    if state["mode"] is None or state["game_over"]:
+        return get_status()
+    board = state["board"]
+    if state["mode"] == "bot" and board.turn == state["bot_color"]:
+        return get_status()
+
+    square = chess.parse_square(square_name)
+
+    if state["selected_square"] is None:
+        piece = board.piece_at(square)
+        if piece is None or piece.color != board.turn:
+            return get_status()
+        state["selected_square"] = square
+        state["legal_targets"] = [m.to_square for m in board.legal_moves if m.from_square == square]
+        return get_status()
+
+    if square == state["selected_square"]:
+        state["selected_square"] = None
+        state["legal_targets"] = []
+        return get_status()
+
+    piece = board.piece_at(square)
+    if piece is not None and piece.color == board.turn:
+        state["selected_square"] = square
+        state["legal_targets"] = [m.to_square for m in board.legal_moves if m.from_square == square]
+        return get_status()
+
+    move = chess.Move(state["selected_square"], square)
+    if move not in board.legal_moves:
+        promo_move = chess.Move(state["selected_square"], square, promotion=chess.QUEEN)
+        if promo_move in board.legal_moves:
+            move = promo_move
+        else:
+            state["selected_square"] = None
+            state["legal_targets"] = []
+            return get_status()
+
+    board.push(move)
+    state["selected_square"] = None
+    state["legal_targets"] = []
+    check_game_over()
+    if not state["game_over"]:
+        turn_name = "White" if board.turn == chess.WHITE else "Black"
+        check_note = " Check!" if board.is_check() else ""
+        state["message"] = f"{turn_name} to move.{check_note}"
+    maybe_play_bot_move()
+    return get_status()
+
+def resign():
+    if state["game_over"] or state["mode"] is None:
+        return get_status()
+    board = state["board"]
+    winner = "Black" if board.turn == chess.WHITE else "White"
+    state["game_over"] = True
+    state["message"] = f"Resignation. {winner} wins."
+    return get_status()
+
+def offer_draw():
+    if state["game_over"] or state["mode"] is None:
+        return get_status()
+    board = state["board"]
+    if state["mode"] == "bot":
+        material = evaluate_board(board)
+        bot_score = material if state["bot_color"] == chess.WHITE else -material
+        if bot_score <= 50:
+            state["game_over"] = True
+            state["message"] = "The bot accepts your draw offer. The game is a draw."
+        else:
+            state["message"] = "The bot declines your draw offer."
+    else:
+        state["message"] = "Ask the other player if they accept the draw."
+    return get_status()
+
+def board_squares():
+    board = state["board"]
+    squares = {}
+    for square in chess.SQUARES:
+        piece = board.piece_at(square)
+        name = chess.square_name(square)
+        squares[name] = PIECE_UNICODE[(piece.piece_type, piece.color)] if piece else ""
+    return squares
+
+def get_status():
+    board = state["board"]
+    return json.dumps({
+        "started": state["mode"] is not None,
+        "mode": state["mode"],
+        "bot_color": ("white" if state["bot_color"] == chess.WHITE else "black") if state["bot_color"] is not None else None,
+        "turn": "white" if board.turn == chess.WHITE else "black",
+        "message": state["message"],
+        "game_over": state["game_over"],
+        "selected_square": chess.square_name(state["selected_square"]) if state["selected_square"] is not None else None,
+        "legal_targets": [chess.square_name(sq) for sq in state["legal_targets"]],
+        "squares": board_squares(),
+    })
+`;
+
+const FILES = "abcdefgh";
+const messageEl = document.getElementById('message');
+const setupPanel = document.getElementById('setupPanel');
+const gameControls = document.getElementById('gameControls');
+const boardEl = document.getElementById('board');
+const startBtn = document.getElementById('startBtn');
+const botColorRow = document.getElementById('botColorRow');
+const difficultyRow = document.getElementById('difficultyRow');
+
+let pyodide;
+let mode = 'bot';
+let botColor = 'random';
+let difficulty = 'easy';
+
+function wireButtonGroup(groupId, onSelect){
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.opt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      onSelect(btn.dataset.value);
+    });
+  });
+}
+
+wireButtonGroup('modeGroup', (value) => {
+  mode = value;
+  const showBotOptions = mode === 'bot';
+  botColorRow.style.display = showBotOptions ? 'flex' : 'none';
+  difficultyRow.style.display = showBotOptions ? 'flex' : 'none';
+});
+wireButtonGroup('botColorGroup', (value) => { botColor = value; });
+wireButtonGroup('difficultyGroup', (value) => { difficulty = value; });
+
+function buildBoard(){
+  boardEl.innerHTML = '';
+  for(let rank=8; rank>=1; rank--){
+    for(let fileIdx=0; fileIdx<8; fileIdx++){
+      const file = FILES[fileIdx];
+      const squareName = `${file}${rank}`;
+      const isLight = (fileIdx + rank) % 2 === 1;
+      const el = document.createElement('div');
+      el.className = 'square ' + (isLight ? 'light' : 'dark');
+      el.id = `sq-${squareName}`;
+      el.dataset.square = squareName;
+      el.addEventListener('click', () => onSquareClick(squareName));
+      boardEl.appendChild(el);
+    }
+  }
+}
+buildBoard();
+
+function onSquareClick(squareName){
+  if(!pyodide) return;
+  const resultJson = pyodide.globals.get('square_click')(squareName);
+  applyStatus(JSON.parse(resultJson));
+}
+
+function applyStatus(status){
+  messageEl.textContent = status.message;
+
+  if(status.started){
+    setupPanel.style.display = 'none';
+    gameControls.style.display = 'flex';
+    boardEl.style.display = 'grid';
+  }
+
+  document.getElementById('offerDrawBtn').disabled = status.game_over;
+  document.getElementById('resignBtn').disabled = status.game_over;
+
+  for(const squareName in status.squares){
+    const el = document.getElementById(`sq-${squareName}`);
+    if(!el) continue;
+    el.textContent = status.squares[squareName];
+    el.classList.remove('selected', 'target', 'has-piece');
+    if(status.selected_square === squareName){
+      el.classList.add('selected');
+    }
+    if(status.legal_targets.includes(squareName)){
+      el.classList.add('target');
+      if(status.squares[squareName] !== ''){
+        el.classList.add('has-piece');
+      }
+    }
+  }
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  if(!pyodide) return;
+  const resultJson = pyodide.globals.get('start_game')(mode, botColor, difficulty);
+  applyStatus(JSON.parse(resultJson));
+});
+
+document.getElementById('resignBtn').addEventListener('click', () => {
+  if(!pyodide) return;
+  const resultJson = pyodide.globals.get('resign')();
+  applyStatus(JSON.parse(resultJson));
+});
+
+document.getElementById('offerDrawBtn').addEventListener('click', () => {
+  if(!pyodide) return;
+  const resultJson = pyodide.globals.get('offer_draw')();
+  applyStatus(JSON.parse(resultJson));
+});
+
+document.getElementById('newGameBtn').addEventListener('click', () => {
+  setupPanel.style.display = 'flex';
+  gameControls.style.display = 'none';
+  boardEl.style.display = 'none';
+  messageEl.textContent = 'Choose your settings and start the game.';
+});
+
+async function boot(){
+  pyodide = await loadPyodide();
+  await pyodide.loadPackage('micropip');
+  const micropip = pyodide.pyimport('micropip');
+  await micropip.install('chess');
+  pyodide.runPython(PYTHON_SOURCE);
+  messageEl.textContent = 'Choose your settings and start the game.';
+  startBtn.disabled = false;
+}
+
+boot();
+</script>
+</body>
+</html>
