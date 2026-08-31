@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Guesser</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root{
+    --felt:#16302A;
+    --felt-dark:#0E211B;
+    --felt-light:#1E3E35;
+    --cream:#F3EAD7;
+    --cream-dim:#E4D8BF;
+    --gold:#D4A72C;
+    --ink:#1B2420;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 800px at 50% -10%, var(--felt-light), var(--felt) 55%, var(--felt-dark) 100%);
+    color:var(--cream);
+    font-family:'Inter',Arial,sans-serif;
+    min-height:100vh;
+    padding:26px 16px 56px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .back-link{align-self:flex-start; color:var(--cream-dim); font-size:13px; text-decoration:none; margin-bottom:18px;}
+  .back-link:hover{color:var(--gold);}
+  h1{font-weight:700; font-size:clamp(26px,5vw,38px); margin:0 0 6px;}
+  .sub{color:var(--cream-dim); font-size:13.5px; margin:0 0 26px; text-align:center; max-width:420px;}
+  .panel{
+    width:min(420px,92vw);
+    background:rgba(0,0,0,.18);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:24px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .message{font-size:15.5px; line-height:1.5; min-height:44px;}
+  input[type=text]{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.24);
+    color:var(--cream);
+    font-size:16px;
+    padding:11px 13px;
+    border-radius:9px;
+    width:100%;
+  }
+  input[type=text]:focus{outline:none; border-color:var(--gold);}
+  button{
+    font-family:inherit;
+    font-weight:700;
+    font-size:15px;
+    color:var(--felt-dark);
+    background:linear-gradient(180deg,#E7C866,var(--gold));
+    border:none;
+    padding:12px 18px;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow:0 4px 0 #9a7620, 0 8px 16px rgba(0,0,0,.35);
+  }
+  button:active{transform:translateY(2px); box-shadow:0 1px 0 #9a7620, 0 4px 8px rgba(0,0,0,.3);}
+  button:disabled{opacity:.5; cursor:default;}
+  .loading{font-size:13.5px; color:var(--cream-dim);}
+</style>
+</head>
+<body>
+
+  <a class="back-link" href="index.html">← Back to games</a>
+  <h1>Number Guesser</h1>
+  <p class="sub">Pick a range, and try to guess the number in as few tries as possible.</p>
+
+  <div class="panel">
+    <div class="message" id="message">Loading the game engine…</div>
+    <input type="text" id="valueInput" placeholder="Enter a number" disabled>
+    <button id="submitBtn" disabled>Submit</button>
+  </div>
+
+<script>
+const PYTHON_SOURCE = `
+import random
+
+state = {
+    "stage": "low_bound",
+    "low": None,
+    "high": None,
+    "number": None,
+    "guesses": 0,
+}
+
+def submit_input(value):
+    stage = state["stage"]
+
+    if stage == "low_bound":
+        if not value.isdigit():
+            return "That wasn't a whole number. Please enter the lower end of the range."
+        state["low"] = int(value)
+        state["stage"] = "high_bound"
+        return "Got it! Now enter the higher end of the range."
+
+    if stage == "high_bound":
+        if not value.isdigit():
+            return "That wasn't a whole number. Please enter the higher end of the range."
+        high = int(value)
+        if high <= state["low"]:
+            return "The higher bound has to be greater than the lower one. Please re-enter it."
+        state["high"] = high
+        state["number"] = random.randint(state["low"], state["high"])
+        state["stage"] = "guessing"
+        state["guesses"] = 0
+        return f"I picked a number between {state['low']} and {state['high']}. Start guessing!"
+
+    if stage == "guessing":
+        if not value.isdigit():
+            return "That wasn't a whole number. Please try again."
+        guess = int(value)
+        state["guesses"] += 1
+        if guess == state["number"]:
+            state["stage"] = "done"
+            plural = "guess" if state["guesses"] == 1 else "guesses"
+            return f"Correct! You got it in {state['guesses']} {plural}."
+        if guess > state["number"]:
+            return "Too high! Try again."
+        return "Too low! Try again."
+
+    return submit_input(value)
+
+def current_stage():
+    return state["stage"]
+
+def reset_game():
+    state["stage"] = "low_bound"
+    state["low"] = None
+    state["high"] = None
+    state["number"] = None
+    state["guesses"] = 0
+    return "Let's play again! Enter the lower end of the range."
+`;
+
+const messageEl = document.getElementById('message');
+const inputEl = document.getElementById('valueInput');
+const submitBtn = document.getElementById('submitBtn');
+
+let pyodide;
+
+async function boot(){
+  pyodide = await loadPyodide();
+  pyodide.runPython(PYTHON_SOURCE);
+  messageEl.textContent = "Let's get started! Enter the lower end of your range.";
+  inputEl.disabled = false;
+  submitBtn.disabled = false;
+  inputEl.focus();
+}
+
+function handleSubmit(){
+  const value = inputEl.value.trim();
+  if(value === "") return;
+
+  const stageBefore = pyodide.globals.get("current_stage")();
+  const submitInput = pyodide.globals.get("submit_input");
+  const resultMessage = submitInput(value);
+  messageEl.textContent = resultMessage;
+  inputEl.value = "";
+
+  const stageAfter = pyodide.globals.get("current_stage")();
+  if(stageAfter === "done"){
+    inputEl.disabled = true;
+    submitBtn.textContent = "Play Again";
+    submitBtn.onclick = () => {
+      const resetMessage = pyodide.globals.get("reset_game")();
+      messageEl.textContent = resetMessage;
+      inputEl.disabled = false;
+      submitBtn.textContent = "Submit";
+      submitBtn.onclick = handleSubmit;
+      inputEl.focus();
+    };
+  }
+}
+
+submitBtn.addEventListener('click', handleSubmit);
+inputEl.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') handleSubmit();
+});
+
+boot();
+</script>
+</body>
+</html>
