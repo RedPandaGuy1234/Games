@@ -9,6 +9,15 @@ DIFFICULTY_LEVELS = {
 }
 STOCKFISH_PATH = "stockfish"
 
+PIECE_VALUES = {
+    chess.PAWN: 100,
+    chess.KNIGHT: 320,
+    chess.BISHOP: 330,
+    chess.ROOK: 500,
+    chess.QUEEN: 900,
+    chess.KING: 0,
+}
+
 
 def new_game():
     return chess.Board()
@@ -60,13 +69,92 @@ def choose_bot_move(
     return result.move
 
 
-def choose_difficulty() -> int:
+def evaluate_board(board: chess.Board) -> int:
+    if board.is_checkmate():
+        return -100000 if board.turn == chess.WHITE else 100000
+    value = 0
+    for piece_type in PIECE_VALUES:
+        value += len(board.pieces(piece_type, chess.WHITE)) * PIECE_VALUES[piece_type]
+        value -= len(board.pieces(piece_type, chess.BLACK)) * PIECE_VALUES[piece_type]
+    return value
+
+
+def minimax(
+    board: chess.Board,
+    depth: int,
+    alpha: float,
+    beta: float,
+    maximizing: bool,
+) -> float:
+    if depth == 0 or board.is_game_over():
+        return evaluate_board(board)
+
+    if maximizing:
+        best = -float("inf")
+        for move in board.legal_moves:
+            board.push(move)
+            best = max(best, minimax(board, depth - 1, alpha, beta, False))
+            board.pop()
+            alpha = max(alpha, best)
+            if beta <= alpha:
+                break
+        return best
+
+    best = float("inf")
+    for move in board.legal_moves:
+        board.push(move)
+        best = min(best, minimax(board, depth - 1, alpha, beta, True))
+        board.pop()
+        beta = min(beta, best)
+        if beta <= alpha:
+            break
+    return best
+
+
+def choose_minimax_move(
+    board: chess.Board,
+    depth: int = 1,
+    blunder_chance: float = 0.35,
+) -> chess.Move:
+    legal_moves = list(board.legal_moves)
+
+    if random.random() < blunder_chance:
+        return random.choice(legal_moves)
+
+    maximizing = board.turn == chess.WHITE
+    best_move = legal_moves[0]
+    best_value = -float("inf") if maximizing else float("inf")
+
+    for move in legal_moves:
+        board.push(move)
+        value = minimax(board, depth, -float("inf"), float("inf"), not maximizing)
+        board.pop()
+        value += random.uniform(-30, 30)
+
+        if maximizing and value > best_value:
+            best_value = value
+            best_move = move
+        elif not maximizing and value < best_value:
+            best_value = value
+            best_move = move
+
+    return best_move
+
+
+def choose_difficulty() -> str:
     choice = (
-        input("Choose a difficulty — Normal (~1400 elo) or Hard (~2000 elo)? (n/h): ")
+        input(
+            "Choose a difficulty — Easy (~600 elo, no Stockfish needed), "
+            "Normal (~1400 elo), or Hard (~2000 elo)? (e/n/h): "
+        )
         .strip()
         .lower()
     )
-    return DIFFICULTY_LEVELS["hard"] if choice == "h" else DIFFICULTY_LEVELS["normal"]
+    if choice == "e":
+        return "easy"
+    if choice == "h":
+        return "hard"
+    return "normal"
 
 
 def choose_bot_color() -> bool:
@@ -95,6 +183,12 @@ def bot_wants_draw(
     return score <= 50
 
 
+def easy_bot_wants_draw(board: chess.Board, bot_color: bool) -> bool:
+    material = evaluate_board(board)
+    score = material if bot_color == chess.WHITE else -material
+    return score <= 100
+
+
 def play_game():
     board = new_game()
 
@@ -102,24 +196,25 @@ def play_game():
     print("Type 'quit' to exit, 'resign' to resign, or 'draw' to offer a draw.\n")
 
     bot_color = None
-    bot_elo = None
+    bot_difficulty = None
     engine = None
 
     play_bot = input("Play against the bot? (y/n): ").strip().lower()
     if play_bot == "y":
         bot_color = choose_bot_color()
-        bot_elo = choose_difficulty()
+        bot_difficulty = choose_difficulty()
 
-        try:
-            engine = start_engine()
-        except FileNotFoundError:
-            print(
-                "\nCouldn't find the Stockfish engine on your PATH. See the "
-                "README for install instructions for your OS. Continuing as "
-                "a human vs. human game instead.\n"
-            )
-            bot_color = None
-            bot_elo = None
+        if bot_difficulty != "easy":
+            try:
+                engine = start_engine()
+            except FileNotFoundError:
+                print(
+                    "\nCouldn't find the Stockfish engine on your PATH. See the "
+                    "README for install instructions for your OS. Continuing as "
+                    "a human vs. human game instead.\n"
+                )
+                bot_color = None
+                bot_difficulty = None
 
     try:
         while not board.is_game_over(claim_draw=True):
@@ -128,7 +223,11 @@ def play_game():
             print(f"\n{turn_name} to move.")
 
             if bot_color is not None and board.turn == bot_color:
-                bot_move = choose_bot_move(engine, board, bot_elo)
+                if bot_difficulty == "easy":
+                    bot_move = choose_minimax_move(board)
+                else:
+                    elo = DIFFICULTY_LEVELS[bot_difficulty]
+                    bot_move = choose_bot_move(engine, board, elo)
                 print(f"Bot plays: {bot_move.uci()}\n")
                 board.push(bot_move)
                 continue
@@ -147,7 +246,11 @@ def play_game():
             if move_uci.lower() == "draw":
                 if bot_color is not None:
                     opponent_color = not board.turn
-                    if bot_wants_draw(engine, board, opponent_color):
+                    if bot_difficulty == "easy":
+                        wants_draw = easy_bot_wants_draw(board, opponent_color)
+                    else:
+                        wants_draw = bot_wants_draw(engine, board, opponent_color)
+                    if wants_draw:
                         print("\nThe bot accepts your draw offer. The game is a draw.")
                         return
                     print("The bot declines your draw offer.\n")
