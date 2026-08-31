@@ -68,20 +68,53 @@ A simple and fun guessing game where you try to guess a randomly selected number
     python3 number_guesser.py
 
 ### Chess
-A terminal-based chess game built from [python-chess](https://github.com/niklasf/python-chess) (A huge thanks to them), handling move legality, board state, and game rules. Includes an optional computer opponent powered by minimax search with alpha-beta pruning.
+A terminal-based chess game built from [python-chess](https://github.com/niklasf/python-chess) (A huge thanks to them), handling move legality, board state, and game rules. Includes an optional computer opponent powered by [Stockfish](https://github.com/official-stockfish/Stockfish), the open-source chess engine.
 
 **Features**
 - Full standard chess rules via `python-chess` (legal move generation, check/checkmate detection, castling, en passant, promotion)
 - Simple board setup and move-making interface
 - Play moves by typing the original square that the piece was on, and the square it is going to (E.g. e2e4).
-- Optional bot opponent: choose to play against the computer and pick which color it plays. The bot evaluates positions by material and searches a few moves ahead (minimax with alpha-beta pruning) to choose its move.
+- Optional bot opponent powered by Stockfish, with two difficulty levels:
+  - **Normal** — capped to roughly 1400 Elo
+  - **Hard** — capped to roughly 2000 Elo
+- Choose to play against the bot and pick which color it plays.
+
+**Requires Stockfish to be installed separately** (it's a compiled chess engine, not a Python package — `pip install -r requirements.txt` won't get it for you). See [Installing Stockfish](#installing-stockfish) below. If Stockfish isn't found, the game falls back to human vs. human instead of crashing.
 
 **Run it**
 
-    cd mainfile/chess
+    cd mainfile/Chess
     python3 board.py
 
-When you start the game, you'll be asked whether you want to play against the bot, and if so, whether the bot should play White or Black.
+When you start the game, you'll be asked whether you want to play against the bot, which color it should play, and which difficulty level (Normal or Hard).
+
+#### Installing Stockfish
+
+**macOS**
+
+    brew install stockfish
+
+**Windows**
+
+    winget install Stockfish.Stockfish
+
+Or download the executable from [stockfishchess.org/download](https://stockfishchess.org/download/) and either add it to your PATH or point `STOCKFISH_PATH` in `mainfile/Chess/board.py` at the full path to the `.exe`.
+
+**Linux (Debian/Ubuntu)**
+
+    sudo apt install stockfish
+
+**Linux (Fedora)**
+
+    sudo dnf install stockfish
+
+**Linux (Arch)**
+
+    sudo pacman -S stockfish
+
+**Any OS, manual install**
+
+Download a prebuilt binary from [stockfishchess.org/download](https://stockfishchess.org/download/), unzip it, and either add it to your PATH or set `STOCKFISH_PATH` in `mainfile/Chess/board.py` to the full path of the binary.
 
 ### Reaction Test
 A quick terminal game that measures how fast your reflexes are. It waits a random amount of time between 1 and 60 seconds, tells you to go, then reports how long it took you to press Enter.
@@ -100,7 +133,7 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
 - **Battleship:** Python 3 or newer, and a terminal
 - **The Questions:** Any modern web browser
 - **Number Guesser:** Python 3 or newer, and a terminal
-- **Chess:** Python 3 or newer, and the `chess` package (see [Installation](#installation))
+- **Chess:** Python 3 or newer, the `chess` package (see [Installation](#installation)), and the [Stockfish](https://stockfishchess.org/download/) engine installed separately (see [Installing Stockfish](#installing-stockfish))
 - **Reaction Test:** Python 3 or newer, and a terminal
 
 ## Installation
@@ -116,27 +149,19 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
 
        pip install -r requirements.txt
 
-4. Regularly update it:
+4. If you want to play Chess against the bot, also install the Stockfish engine — see [Installing Stockfish](#installing-stockfish).
+
+5. Regularly update it:
 
        git pull
 
-5. Jump into whichever game you want to play — see [Games in This Repo](#games-in-this-repo) above for how to run each one.
-
-## Contributing
-Contributions are welcome, whether that's fixes or additions to an existing game or an entirely new game added to the collection. Suggested workflow:
-1. Fork the repo
-2. Commit changes to your fork
-3. Open a pull request
-
-If you want to run Black, run ```black .```
-
-Please include tests where applicable, follow the existing code style for whichever game you're touching, and keep each game's files self-contained within its own folder.
+6. Jump into whichever game you want to play — see [Games in This Repo](#games-in-this-repo) above for how to run each one.
 
 ## License
 This project is released under the GPL-3.0 License. See [LICENSE](LICENSE) for details. This license applies repo-wide unless a specific game's folder states otherwise.
 
 ## Credits
-This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess) and black for formatting: [black](https://github.com/psf/black).
+This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess), the [Stockfish](https://github.com/official-stockfish/Stockfish) chess engine, and black for formatting: [black](https://github.com/psf/black).
 
 ## Contact
 Maintainer: RedPandaGuy1234
