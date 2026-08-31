@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reaction Test</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root{
+    --felt:#16302A;
+    --felt-dark:#0E211B;
+    --felt-light:#1E3E35;
+    --cream:#F3EAD7;
+    --cream-dim:#E4D8BF;
+    --gold:#D4A72C;
+    --go:#3E8E5B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 800px at 50% -10%, var(--felt-light), var(--felt) 55%, var(--felt-dark) 100%);
+    color:var(--cream);
+    font-family:'Inter',Arial,sans-serif;
+    min-height:100vh;
+    padding:26px 16px 56px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .back-link{align-self:flex-start; color:var(--cream-dim); font-size:13px; text-decoration:none; margin-bottom:18px;}
+  .back-link:hover{color:var(--gold);}
+  h1{font-weight:700; font-size:clamp(26px,5vw,38px); margin:0 0 6px;}
+  .sub{color:var(--cream-dim); font-size:13.5px; margin:0 0 26px; text-align:center; max-width:420px;}
+  .pad{
+    width:min(360px,90vw); height:min(360px,90vw);
+    border-radius:20px;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:20px;
+    font-family:inherit; font-weight:700; font-size:20px;
+    cursor:pointer; user-select:none;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.15);
+    transition:background .15s ease;
+  }
+  .pad.waiting{background:rgba(180,85,42,.35);}
+  .pad.go{background:var(--go);}
+  .pad.idle:hover{background:rgba(255,255,255,.1);}
+</style>
+</head>
+<body>
+
+  <a class="back-link" href="index.html">← Back to games</a>
+  <h1>Reaction Test</h1>
+  <p class="sub">Click to start, wait for the box to turn green, then click as fast as you can.</p>
+
+  <div class="pad idle" id="pad">Loading the game engine…</div>
+
+<script>
+const PYTHON_SOURCE = `
+import random
+
+def get_delay_seconds():
+    return random.randint(1, 60)
+
+def format_result(elapsed_seconds, delay_seconds):
+    return f"It took you {elapsed_seconds:.3f} seconds to react, after waiting for {delay_seconds} seconds! Click to try again."
+`;
+
+const pad = document.getElementById('pad');
+let pyodide;
+let stage = 'idle';
+let timeoutHandle = null;
+let goTimestamp = null;
+
+function setPad(text, cls){
+  pad.textContent = text;
+  pad.className = 'pad ' + cls;
+}
+
+async function boot(){
+  pyodide = await loadPyodide();
+  pyodide.runPython(PYTHON_SOURCE);
+  stage = 'idle';
+  setPad('Click to start!', 'idle');
+}
+
+pad.addEventListener('click', () => {
+  if(!pyodide) return;
+
+  if(stage === 'idle'){
+    stage = 'waiting';
+    setPad('Wait for green…', 'waiting');
+    const delaySeconds = pyodide.globals.get('get_delay_seconds')();
+    timeoutHandle = setTimeout(() => {
+      stage = 'go';
+      goTimestamp = performance.now();
+      setPad('CLICK NOW!', 'go');
+    }, delaySeconds * 1000);
+    pad.dataset.delay = delaySeconds;
+    return;
+  }
+
+  if(stage === 'waiting'){
+    clearTimeout(timeoutHandle);
+    stage = 'idle';
+    setPad('Too soon! You clicked before green. Click to try again.', 'idle');
+    return;
+  }
+
+  if(stage === 'go'){
+    const elapsedSeconds = (performance.now() - goTimestamp) / 1000;
+    const delaySeconds = parseInt(pad.dataset.delay, 10);
+    const formatResult = pyodide.globals.get('format_result');
+    const resultText = formatResult(elapsedSeconds, delaySeconds);
+    stage = 'idle';
+    setPad(resultText, 'idle');
+    return;
+  }
+});
+
+boot();
+</script>
+</body>
+</html>
