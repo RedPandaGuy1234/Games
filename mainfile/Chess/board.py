@@ -52,7 +52,7 @@ def choose_bot_move(
     elo: int,
     think_time: float = 1.0,
 ) -> chess.Move:
- 
+
     engine.configure({"UCI_LimitStrength": True, "UCI_Elo": elo})
     result = engine.play(board, chess.engine.Limit(time=think_time))
     return result.move
