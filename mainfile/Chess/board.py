@@ -1,16 +1,10 @@
 import chess
 import chess.engine
 
-# Roughly maps to real-world Elo. Stockfish's own strength limiter (UCI_Elo)
-# won't go below ~1320, so both levels sit above that floor.
 DIFFICULTY_LEVELS = {
     "normal": 1400,
     "hard": 2000,
 }
-
-# Assumes Stockfish is installed and on your PATH (e.g. `brew install stockfish`
-# on macOS). If you installed it somewhere else, change this to the full path
-# to the binary.
 STOCKFISH_PATH = "stockfish"
 
 
@@ -58,11 +52,7 @@ def choose_bot_move(
     elo: int,
     think_time: float = 1.0,
 ) -> chess.Move:
-    """Ask Stockfish for a move, capped to roughly `elo` playing strength.
-
-    UCI_LimitStrength tells Stockfish to deliberately play worse than its
-    best, and UCI_Elo sets the target rating for that weaker play.
-    """
+ 
     engine.configure({"UCI_LimitStrength": True, "UCI_Elo": elo})
     result = engine.play(board, chess.engine.Limit(time=think_time))
     return result.move
@@ -99,9 +89,9 @@ def play_game():
             engine = start_engine()
         except FileNotFoundError:
             print(
-                "\nCouldn't find the Stockfish engine on your PATH. Install it "
-                "first — on macOS: `brew install stockfish`. Continuing as a "
-                "human vs. human game instead.\n"
+                "\nCouldn't find the Stockfish engine on your PATH. See the "
+                "README for install instructions for your OS. Continuing as "
+                "a human vs. human game instead.\n"
             )
             bot_color = None
             bot_elo = None
