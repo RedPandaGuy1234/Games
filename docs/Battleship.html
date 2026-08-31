@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battleship</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root{
+    --felt:#16302A;
+    --felt-dark:#0E211B;
+    --felt-light:#1E3E35;
+    --cream:#F3EAD7;
+    --cream-dim:#E4D8BF;
+    --gold:#D4A72C;
+    --ink:#1B2420;
+    --ship:#7CB9F2;
+    --hit:#B4552A;
+    --miss:rgba(255,255,255,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 800px at 50% -10%, var(--felt-light), var(--felt) 55%, var(--felt-dark) 100%);
+    color:var(--cream);
+    font-family:'Inter',Arial,sans-serif;
+    min-height:100vh;
+    padding:26px 16px 56px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .back-link{align-self:flex-start; color:var(--cream-dim); font-size:13px; text-decoration:none; margin-bottom:18px;}
+  .back-link:hover{color:var(--gold);}
+  h1{font-weight:700; font-size:clamp(26px,5vw,38px); margin:0 0 6px;}
+  .sub{color:var(--cream-dim); font-size:13.5px; margin:0 0 20px; text-align:center; max-width:460px;}
+  .message{
+    font-size:15px; line-height:1.5; text-align:center; max-width:600px;
+    background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.08);
+    border-radius:10px; padding:12px 16px; margin-bottom:18px; min-height:22px;
+  }
+  .controls{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:22px;}
+  button{
+    font-family:inherit; font-weight:700; font-size:13.5px;
+    color:var(--felt-dark); background:linear-gradient(180deg,#E7C866,var(--gold));
+    border:none; padding:10px 18px; border-radius:999px; cursor:pointer;
+    box-shadow:0 3px 0 #9a7620, 0 6px 12px rgba(0,0,0,.3);
+  }
+  button:active{transform:translateY(2px); box-shadow:0 1px 0 #9a7620, 0 3px 6px rgba(0,0,0,.3);}
+  button:disabled{opacity:.45; cursor:default;}
+  button.secondary{
+    background:rgba(255,255,255,.08); color:var(--cream);
+    box-shadow:0 3px 0 rgba(0,0,0,.3), 0 6px 12px rgba(0,0,0,.25);
+  }
+  .boards{display:flex; gap:34px; flex-wrap:wrap; justify-content:center; align-items:flex-start;}
+  .board-block{display:flex; flex-direction:column; align-items:center; gap:10px;}
+  .board-title{font-family:inherit; font-weight:700; font-size:14.5px; color:var(--gold);}
+  .board-grid{
+    display:grid;
+    grid-template-columns: 20px repeat(10, 28px);
+    grid-template-rows: 20px repeat(10, 28px);
+    gap:2px;
+  }
+  .cell{
+    width:28px; height:28px; border-radius:5px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.15);
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .cell.label{background:none; border:none; cursor:default; color:var(--cream-dim); font-size:10.5px;}
+  .cell.ship{background:var(--ship);}
+  .cell.hit{background:var(--hit);}
+  .cell.miss{background:transparent;}
+  .cell.miss::after{content:''; width:8px; height:8px; border-radius:50%; background:var(--miss);}
+  .cell.selected{outline:2px solid var(--gold);}
+  .cell.static{cursor:default;}
+  .placement-panel{
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.08);
+    border-radius:12px; padding:14px 18px; margin-bottom:20px; min-width:260px;
+  }
+  .ship-checklist{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; font-size:11.5px; color:var(--cream-dim);}
+  .ship-checklist span.done{color:var(--gold); font-weight:700;}
+</style>
+</head>
+<body>
+
+  <a class="back-link" href="index.html">← Back to games</a>
+  <h1>Battleship</h1>
+  <p class="sub">Place your fleet, then take turns firing on the enemy waters. Sink every enemy ship to win.</p>
+
+  <div class="message" id="message">Loading the game engine…</div>
+
+  <div class="placement-panel" id="placementPanel" style="display:none">
+    <div class="ship-checklist" id="shipChecklist"></div>
+    <div class="controls">
+      <button id="randomizeBtn">Randomize My Fleet</button>
+      <button class="secondary" id="cancelBtn" disabled>Cancel Selection</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="secondary" id="newGameBtn">New Game</button>
+  </div>
+
+  <div class="boards">
+    <div class="board-block">
+      <div class="board-title">Your Fleet</div>
+      <div class="board-grid" id="playerGrid"></div>
+    </div>
+    <div class="board-block">
+      <div class="board-title">Enemy Waters</div>
+      <div class="board-grid" id="botGrid"></div>
+    </div>
+  </div>
+
+<script>
+const PYTHON_SOURCE = `
+import random
+import json
+
+COLS = "ABCDEFGHIJ"
+
+SHIPS = [
+    ("patrol", "Patrol Boat", 2),
+    ("destroyer", "Destroyer", 3),
+    ("submarine", "Submarine", 3),
+    ("battleship", "Battleship", 4),
+    ("carrier", "Carrier", 5),
+]
+
+def make_empty_board():
+    return [[None for _ in range(10)] for _ in range(10)]
+
+def new_game_state():
+    return {
+        "phase": "placing",
+        "ship_index": 0,
+        "first_click": None,
+        "player_board": make_empty_board(),
+        "player_ships": {},
+        "bot_board": make_empty_board(),
+        "bot_ships": {},
+        "player_shots": set(),
+        "bot_shots": set(),
+        "bot_hunt_queue": [],
+        "message": "",
+        "winner": None,
+    }
+
+state = new_game_state()
+
+def current_ship():
+    if state["ship_index"] >= len(SHIPS):
+        return None
+    return SHIPS[state["ship_index"]]
+
+def ship_name(ship_id):
+    for sid, name, length in SHIPS:
+        if sid == ship_id:
+            return name
+    return ship_id
+
+def parse_cell(cell_str):
+    col = cell_str[0]
+    if col not in COLS:
+        return None
+    row_part = cell_str[1:]
+    if not row_part.isdigit():
+        return None
+    row = int(row_part)
+    if not (1 <= row <= 10):
+        return None
+    return (COLS.index(col), row - 1)
+
+def cells_between(c1, r1, c2, r2, length):
+    if r1 == r2 and abs(c1 - c2) == length - 1:
+        step = 1 if c2 > c1 else -1
+        return [(c1 + step * i, r1) for i in range(length)]
+    if c1 == c2 and abs(r1 - r2) == length - 1:
+        step = 1 if r2 > r1 else -1
+        return [(c1, r1 + step * i) for i in range(length)]
+    return None
+
+def is_valid_placement(cells, board):
+    for c, r in cells:
+        if not (0 <= c < 10 and 0 <= r < 10):
+            return False
+        if board[r][c] is not None:
+            return False
+    return True
+
+def place_ship_cells(board, ships, ship_id, cells):
+    for c, r in cells:
+        board[r][c] = ship_id
+    ships[ship_id] = set(cells)
+
+def random_place_all(board, ships):
+    for ship_id, name, length in SHIPS:
+        placed = False
+        while not placed:
+            horizontal = random.choice([True, False])
+            if horizontal:
+                r = random.randint(0, 9)
+                c = random.randint(0, 10 - length)
+                cells = [(c + i, r) for i in range(length)]
+            else:
+                c = random.randint(0, 9)
+                r = random.randint(0, 10 - length)
+                cells = [(c, r + i) for i in range(length)]
+            if is_valid_placement(cells, board):
+                place_ship_cells(board, ships, ship_id, cells)
+                placed = True
+
+def place_bot_ships():
+    state["bot_board"] = make_empty_board()
+    state["bot_ships"] = {}
+    random_place_all(state["bot_board"], state["bot_ships"])
+
+def click_player_cell(cell_str):
+    if state["phase"] != "placing":
+        return get_status()
+    parsed = parse_cell(cell_str)
+    if parsed is None:
+        return get_status()
+    c, r = parsed
+    ship = current_ship()
+    if ship is None:
+        return get_status()
+    ship_id, name, length = ship
+
+    if state["first_click"] is None:
+        if state["player_board"][r][c] is not None:
+            state["message"] = "That cell is already occupied. Choose another."
+            return get_status()
+        state["first_click"] = (c, r)
+        state["message"] = f"First cell set for the {name}. Now click the other end ({length} cells total, same row or column)."
+        return get_status()
+
+    c1, r1 = state["first_click"]
+    cells = cells_between(c1, r1, c, r, length)
+    if cells is None:
+        state["message"] = f"That doesn't line up as a {length}-cell ship. Pick two endpoints in the same row or column, exactly {length - 1} apart."
+        return get_status()
+    if not is_valid_placement(cells, state["player_board"]):
+        state["message"] = "That placement overlaps another ship or goes off the board. Try again."
+        state["first_click"] = None
+        return get_status()
+
+    place_ship_cells(state["player_board"], state["player_ships"], ship_id, cells)
+    state["first_click"] = None
+    state["ship_index"] += 1
+
+    next_ship = current_ship()
+    if next_ship is None:
+        place_bot_ships()
+        state["phase"] = "battle"
+        state["message"] = "All ships placed! Fire on the enemy waters to begin."
+    else:
+        state["message"] = f"{name} placed! Now place your {next_ship[1]} ({next_ship[2]} cells)."
+    return get_status()
+
+def cancel_first_click():
+    state["first_click"] = None
+    ship = current_ship()
+    if ship:
+        state["message"] = f"Selection cancelled. Click a cell to start placing your {ship[1]} again."
+    return get_status()
+
+def randomize_player_ships():
+    if state["phase"] != "placing":
+        return get_status()
+    board = make_empty_board()
+    ships = {}
+    random_place_all(board, ships)
+    state["player_board"] = board
+    state["player_ships"] = ships
+    state["ship_index"] = len(SHIPS)
+    state["first_click"] = None
+    place_bot_ships()
+    state["phase"] = "battle"
+    state["message"] = "Fleet randomized! Fire on the enemy waters to begin."
+    return get_status()
+
+def all_sunk(ships, shots):
+    for ship_id, cells in ships.items():
+        if not cells.issubset(shots):
+            return False
+    return True
+
+def ship_at(ships, c, r):
+    for ship_id, cells in ships.items():
+        if (c, r) in cells:
+            return ship_id
+    return None
+
+def add_hunt_targets(c, r):
+    for dc, dr in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+        nc, nr = c + dc, r + dr
+        if 0 <= nc < 10 and 0 <= nr < 10 and (nc, nr) not in state["bot_shots"] and (nc, nr) not in state["bot_hunt_queue"]:
+            state["bot_hunt_queue"].append((nc, nr))
+
+def choose_bot_shot():
+    while state["bot_hunt_queue"]:
+        c, r = state["bot_hunt_queue"].pop(0)
+        if (c, r) not in state["bot_shots"]:
+            return (c, r)
+    while True:
+        c = random.randint(0, 9)
+        r = random.randint(0, 9)
+        if (c, r) not in state["bot_shots"]:
+            return (c, r)
+
+def bot_turn():
+    if state["winner"] is not None:
+        return
+    c, r = choose_bot_shot()
+    state["bot_shots"].add((c, r))
+    hit_ship = ship_at(state["player_ships"], c, r)
+    col_letter = COLS[c]
+    row_num = r + 1
+    if hit_ship:
+        cells = state["player_ships"][hit_ship]
+        add_hunt_targets(c, r)
+        if cells.issubset(state["bot_shots"]):
+            state["message"] += f" The enemy fires at {col_letter}{row_num} — hit, and they sank your {ship_name(hit_ship)}!"
+            state["bot_hunt_queue"] = [t for t in state["bot_hunt_queue"] if t not in cells]
+        else:
+            state["message"] += f" The enemy fires at {col_letter}{row_num} — hit!"
+        if all_sunk(state["player_ships"], state["bot_shots"]):
+            state["winner"] = "bot"
+            state["message"] += " Your fleet has been destroyed. The enemy wins."
+    else:
+        state["message"] += f" The enemy fires at {col_letter}{row_num} — miss."
+
+def fire_at_bot(cell_str):
+    if state["phase"] != "battle" or state["winner"] is not None:
+        return get_status()
+    parsed = parse_cell(cell_str)
+    if parsed is None:
+        return get_status()
+    c, r = parsed
+    if (c, r) in state["player_shots"]:
+        state["message"] = "You already fired there. Choose another cell."
+        return get_status()
+    state["player_shots"].add((c, r))
+    hit_ship = ship_at(state["bot_ships"], c, r)
+    if hit_ship:
+        cells = state["bot_ships"][hit_ship]
+        if cells.issubset(state["player_shots"]):
+            state["message"] = f"Hit! You sank the enemy {ship_name(hit_ship)}!"
+        else:
+            state["message"] = "Hit!"
+        if all_sunk(state["bot_ships"], state["player_shots"]):
+            state["winner"] = "player"
+            state["message"] = "You sank the entire enemy fleet! You win!"
+            return get_status()
+    else:
+        state["message"] = "Miss."
+
+    bot_turn()
+    return get_status()
+
+def get_player_board_view():
+    view = []
+    for r in range(10):
+        row = []
+        for c in range(10):
+            cell = state["player_board"][r][c]
+            shot = (c, r) in state["bot_shots"]
+            if cell is not None and shot:
+                row.append("hit")
+            elif cell is not None:
+                row.append("ship")
+            elif shot:
+                row.append("miss")
+            else:
+                row.append("empty")
+        view.append(row)
+    return view
+
+def get_bot_board_view():
+    view = []
+    for r in range(10):
+        row = []
+        for c in range(10):
+            shot = (c, r) in state["player_shots"]
+            cell = state["bot_board"][r][c]
+            if cell is not None and shot:
+                row.append("hit")
+            elif shot:
+                row.append("miss")
+            else:
+                row.append("empty")
+        view.append(row)
+    return view
+
+def placed_ship_names():
+    return [name for sid, name, length in SHIPS if sid in state["player_ships"]]
+
+def get_status():
+    ship = current_ship()
+    payload = {
+        "phase": state["phase"],
+        "message": state["message"],
+        "winner": state["winner"],
+        "current_ship_name": ship[1] if ship else None,
+        "current_ship_length": ship[2] if ship else None,
+        "awaiting_second_click": state["first_click"] is not None,
+        "placed_ships": placed_ship_names(),
+        "player_board": get_player_board_view(),
+        "bot_board": get_bot_board_view(),
+    }
+    return json.dumps(payload)
+
+def reset_full_game():
+    global state
+    state = new_game_state()
+    state["message"] = f"Place your {SHIPS[0][1]} ({SHIPS[0][2]} cells). Click one end, then the other."
+    return get_status()
+`;
+
+const COLS = "ABCDEFGHIJ";
+const messageEl = document.getElementById('message');
+const placementPanel = document.getElementById('placementPanel');
+const shipChecklist = document.getElementById('shipChecklist');
+const cancelBtn = document.getElementById('cancelBtn');
+const randomizeBtn = document.getElementById('randomizeBtn');
+const newGameBtn = document.getElementById('newGameBtn');
+
+const ALL_SHIP_NAMES = ["Patrol Boat", "Destroyer", "Submarine", "Battleship", "Carrier"];
+
+let pyodide;
+
+function buildGrid(container, prefix, clickable){
+  container.innerHTML = '';
+  const corner = document.createElement('div');
+  corner.className = 'cell label';
+  container.appendChild(corner);
+  for(let c=0;c<10;c++){
+    const label = document.createElement('div');
+    label.className = 'cell label';
+    label.textContent = COLS[c];
+    container.appendChild(label);
+  }
+  for(let r=0;r<10;r++){
+    const rowLabel = document.createElement('div');
+    rowLabel.className = 'cell label';
+    rowLabel.textContent = (r+1);
+    container.appendChild(rowLabel);
+    for(let c=0;c<10;c++){
+      const cell = document.createElement('div');
+      cell.className = 'cell' + (clickable ? '' : ' static');
+      cell.id = `${prefix}-${c}-${r}`;
+      if(clickable){
+        cell.addEventListener('click', () => onCellClick(prefix, c, r));
+      }
+      container.appendChild(cell);
+    }
+  }
+}
+
+const playerGridEl = document.getElementById('playerGrid');
+const botGridEl = document.getElementById('botGrid');
+buildGrid(playerGridEl, 'player', true);
+buildGrid(botGridEl, 'bot', true);
+
+function renderBoard(prefix, boardView){
+  for(let r=0;r<10;r++){
+    for(let c=0;c<10;c++){
+      const cell = document.getElementById(`${prefix}-${c}-${r}`);
+      cell.className = 'cell' + (prefix === 'bot' ? '' : ' static');
+      const status = boardView[r][c];
+      if(status === 'ship') cell.classList.add('ship');
+      else if(status === 'hit') cell.classList.add('hit');
+      else if(status === 'miss') cell.classList.add('miss');
+    }
+  }
+}
+
+function renderChecklist(placedShips){
+  shipChecklist.innerHTML = ALL_SHIP_NAMES.map(name => {
+    const done = placedShips.includes(name);
+    return `<span class="${done ? 'done' : ''}">${done ? '✓ ' : ''}${name}</span>`;
+  }).join('');
+}
+
+function applyStatus(status){
+  messageEl.textContent = status.message;
+
+  if(status.phase === 'placing'){
+    placementPanel.style.display = 'flex';
+    randomizeBtn.disabled = false;
+    cancelBtn.disabled = !status.awaiting_second_click;
+    renderChecklist(status.placed_ships);
+  } else {
+    placementPanel.style.display = 'none';
+  }
+
+  renderBoard('player', status.player_board);
+  renderBoard('bot', status.bot_board);
+
+  playerGridEl.querySelectorAll('.cell').forEach(cell => {
+    cell.style.cursor = (status.phase === 'placing') ? 'pointer' : 'default';
+  });
+  botGridEl.querySelectorAll('.cell').forEach(cell => {
+    cell.style.cursor = (status.phase === 'battle' && !status.winner) ? 'pointer' : 'default';
+  });
+}
+
+function cellStr(c, r){
+  return `${COLS[c]}${r+1}`;
+}
+
+function onCellClick(prefix, c, r){
+  if(!pyodide) return;
+  const label = cellStr(c, r);
+  let resultJson;
+  if(prefix === 'player'){
+    resultJson = pyodide.globals.get('click_player_cell')(label);
+  } else {
+    resultJson = pyodide.globals.get('fire_at_bot')(label);
+  }
+  applyStatus(JSON.parse(resultJson));
+}
+
+randomizeBtn.addEventListener('click', () => {
+  if(!pyodide) return;
+  const resultJson = pyodide.globals.get('randomize_player_ships')();
+  applyStatus(JSON.parse(resultJson));
+});
+
+cancelBtn.addEventListener('click', () => {
+  if(!pyodide) return;
+  const resultJson = pyodide.globals.get('cancel_first_click')();
+  applyStatus(JSON.parse(resultJson));
+});
+
+newGameBtn.addEventListener('click', () => {
+  if(!pyodide) return;
+  const resultJson = pyodide.globals.get('reset_full_game')();
+  applyStatus(JSON.parse(resultJson));
+});
+
+async function boot(){
+  pyodide = await loadPyodide();
+  pyodide.runPython(PYTHON_SOURCE);
+  const resultJson = pyodide.globals.get('reset_full_game')();
+  applyStatus(JSON.parse(resultJson));
+}
+
+boot();
+</script>
+</body>
+</html>
