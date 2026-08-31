@@ -68,25 +68,27 @@ A simple and fun guessing game where you try to guess a randomly selected number
     python3 number_guesser.py
 
 ### Chess
-A terminal-based chess game built from [python-chess](https://github.com/niklasf/python-chess) (A huge thanks to them), handling move legality, board state, and game rules. Includes an optional computer opponent powered by [Stockfish](https://github.com/official-stockfish/Stockfish), the open-source chess engine.
+A terminal-based chess game built from [python-chess](https://github.com/niklasf/python-chess) (A huge thanks to them), handling move legality, board state, and game rules. Includes an optional computer opponent, either a lightweight built-in bot or Stockfish, the open-source chess engine.
 
 **Features**
 - Full standard chess rules via `python-chess` (legal move generation, check/checkmate detection, castling, en passant, promotion)
 - Simple board setup and move-making interface
-- Play moves by typing the original square that the piece was on, and the square it is going to (E.g. e2e4).
-- Optional bot opponent powered by Stockfish, with two difficulty levels:
-  - **Normal** — capped to roughly 1400 Elo
-  - **Hard** — capped to roughly 2000 Elo
-- Choose to play against the bot and pick which color it plays.
+- Play moves by typing the original square that the piece was on, and the square it is going to (E.g. e2e4). Castling is entered the same way — move your king two squares toward the rook (e.g. e1g1 for White kingside).
+- Resign at any time by typing `resign`, or offer a draw by typing `draw`
+- Optional bot opponent with three difficulty levels:
+  - **Easy** — a lightweight built-in minimax bot (~600 elo), no Stockfish required
+  - **Normal** — Stockfish, capped to roughly 1400 Elo
+  - **Hard** — Stockfish, capped to roughly 2000 Elo
+- Choose to play against the bot, pick its color (White, Black, or Random), and pick a difficulty level.
 
-**Requires Stockfish to be installed separately** (it's a compiled chess engine, not a Python package — `pip install -r requirements.txt` won't get it for you). See [Installing Stockfish](#installing-stockfish) below. If Stockfish isn't found, the game falls back to human vs. human instead of crashing.
+**Easy mode requires no extra setup** — it's a small built-in minimax bot with no external dependencies. **Normal and Hard modes require Stockfish to be installed separately** (it's a compiled chess engine, not a Python package — `pip install -r requirements.txt` won't get it for you). See [Installing Stockfish](#installing-stockfish) below. If Stockfish isn't found for Normal or Hard mode, the game falls back to human vs. human instead of crashing.
 
 **Run it**
 
     cd mainfile/Chess
     python3 board.py
 
-When you start the game, you'll be asked whether you want to play against the bot, which color it should play, and which difficulty level (Normal or Hard).
+When you start the game, you'll be asked whether you want to play against the bot, which color it should play (or Random), and which difficulty level (Easy, Normal, or Hard).
 
 #### Installing Stockfish
 
@@ -133,7 +135,7 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
 - **Battleship:** Python 3 or newer, and a terminal
 - **The Questions:** Any modern web browser
 - **Number Guesser:** Python 3 or newer, and a terminal
-- **Chess:** Python 3 or newer, the `chess` package (see [Installation](#installation)), and the [Stockfish](https://stockfishchess.org/download/) engine installed separately (see [Installing Stockfish](#installing-stockfish))
+- **Chess:** Python 3 or newer, and the `chess` package (see [Installation](#installation)). The [Stockfish](https://stockfishchess.org/download/) engine is only needed for Normal/Hard bot difficulty (see [Installing Stockfish](#installing-stockfish)); Easy mode needs nothing extra.
 - **Reaction Test:** Python 3 or newer, and a terminal
 
 ## Installation
@@ -149,7 +151,7 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
 
        pip install -r requirements.txt
 
-4. If you want to play Chess against the bot, also install the Stockfish engine — see [Installing Stockfish](#installing-stockfish).
+4. If you want to play Chess against the bot on Normal or Hard difficulty, also install the Stockfish engine — see [Installing Stockfish](#installing-stockfish). Easy mode works without it.
 
 5. Regularly update it:
 
