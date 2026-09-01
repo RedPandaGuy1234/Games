@@ -50,7 +50,7 @@ Classic Battleship, playable in your terminal or your browser, with a bot oppone
 **Run it in your terminal**
 
     cd mainfile/Battleship
-    python3 Set_Up_Ships.py
+    python3 Battleship.py
 
 **Gameplay basics**
 - Board coordinates use letters for columns and numbers for rows (e.g., A1, B7).
