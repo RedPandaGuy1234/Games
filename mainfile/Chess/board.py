@@ -159,9 +159,7 @@ def choose_difficulty() -> str:
 
 def choose_bot_color() -> bool:
     choice = (
-        input("Should the bot play White, Black, or Random? (w/b/r): ")
-        .strip()
-        .lower()
+        input("Should the bot play White, Black, or Random? (w/b/r): ").strip().lower()
     )
     if choice == "w":
         return chess.WHITE

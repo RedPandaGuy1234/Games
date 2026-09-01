@@ -78,12 +78,12 @@ def random_place_all(board, ships):
 def prompt_ship_placement(board, ships, ship_id, name, length):
     print(f"\nPlace your {name} ({length} cells).")
     while True:
-        first_input = input(
-            f"Enter the first coordinate for the {name} (e.g. E4): "
-        )
+        first_input = input(f"Enter the first coordinate for the {name} (e.g. E4): ")
         first = parse_cell(first_input)
         if first is None:
-            print("That wasn't a valid coordinate. Use a letter A-J followed by a number 1-10.")
+            print(
+                "That wasn't a valid coordinate. Use a letter A-J followed by a number 1-10."
+            )
             continue
         c1, r1 = first
         if board[r1][c1] is not None:
@@ -97,7 +97,9 @@ def prompt_ship_placement(board, ships, ship_id, name, length):
         )
         second = parse_cell(second_input)
         if second is None:
-            print("That wasn't a valid coordinate. Use a letter A-J followed by a number 1-10.")
+            print(
+                "That wasn't a valid coordinate. Use a letter A-J followed by a number 1-10."
+            )
             continue
         c2, r2 = second
         cells = cells_between(c1, r1, c2, r2, length)
@@ -108,7 +110,9 @@ def prompt_ship_placement(board, ships, ship_id, name, length):
             )
             continue
         if not is_valid_placement(cells, board):
-            print("That placement overlaps another ship or goes off the board. Try again.")
+            print(
+                "That placement overlaps another ship or goes off the board. Try again."
+            )
             continue
         place_ship_cells(board, ships, ship_id, cells)
         break
@@ -171,7 +175,12 @@ def print_board(board, ships, shots, reveal):
 def add_hunt_targets(hunt_queue, shots, c, r):
     for dc, dr in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
         nc, nr = c + dc, r + dr
-        if 0 <= nc < 10 and 0 <= nr < 10 and (nc, nr) not in shots and (nc, nr) not in hunt_queue:
+        if (
+            0 <= nc < 10
+            and 0 <= nr < 10
+            and (nc, nr) not in shots
+            and (nc, nr) not in hunt_queue
+        ):
             hunt_queue.append((nc, nr))
 
 
@@ -192,7 +201,9 @@ def player_turn(bot_board, bot_ships, player_shots):
         cell_input = input("\nEnter a coordinate to fire at (e.g. E4): ")
         parsed = parse_cell(cell_input)
         if parsed is None:
-            print("That wasn't a valid coordinate. Use a letter A-J followed by a number 1-10.")
+            print(
+                "That wasn't a valid coordinate. Use a letter A-J followed by a number 1-10."
+            )
             continue
         c, r = parsed
         if (c, r) in player_shots:
@@ -224,7 +235,9 @@ def bot_turn(player_board, player_ships, bot_shots, hunt_queue):
         cells = player_ships[hit_ship]
         add_hunt_targets(hunt_queue, bot_shots, c, r)
         if cells.issubset(bot_shots):
-            print(f"The enemy fires at {col_letter}{row_num} — hit, and they sank your {ship_name(hit_ship)}!")
+            print(
+                f"The enemy fires at {col_letter}{row_num} — hit, and they sank your {ship_name(hit_ship)}!"
+            )
             hunt_queue[:] = [t for t in hunt_queue if t not in cells]
         else:
             print(f"The enemy fires at {col_letter}{row_num} — hit!")
