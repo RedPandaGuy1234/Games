@@ -1,8 +1,12 @@
 # Games
 
-A small collection of games, built by me. This repo started as a single Python Battleship implementation and has grown into a home for multiple games — some playable in your terminal, some in your browser.
+A small collection of games, built by me. This repo started as a single Python Battleship implementation and has grown into a home for multiple games — most of them playable both in your terminal and right in your browser.
+
+**Play in your browser:** https://redpandaguy1234.github.io/Games/
+*(once GitHub Pages is enabled for this repo — see [Playing in Your Browser](#playing-in-your-browser) below)*
 
 ## Table of Contents
+- [Playing in Your Browser](#playing-in-your-browser)
 - [Games in This Repo](#games-in-this-repo)
   - [Battleship](#battleship)
   - [The Questions](#the-questions)
@@ -15,82 +19,107 @@ A small collection of games, built by me. This repo started as a single Python B
 - [License](#license)
 - [Contact](#contact)
 
+## Playing in Your Browser
+
+Battleship, Number Guesser, Chess, and Reaction Test all have browser versions in the `docs/` folder, alongside the original terminal versions in `mainfile/`. The Questions has only ever lived in the browser.
+
+The browser versions run entirely client-side using [Pyodide](https://pyodide.org) (Python compiled to WebAssembly) — your actual game logic runs as real Python inside the page, not a JavaScript rewrite. No installation, no Python setup, no server of your own required once it's deployed to GitHub Pages.
+
+**To test the browser versions locally**, open a terminal in the `docs/` folder and run:
+
+    python3 -m http.server 8000
+
+Then visit `http://localhost:8000/index.html` in your browser. Opening the HTML files directly (double-clicking them, or a `file://` URL) will not work — Pyodide needs to fetch its WebAssembly runtime over HTTP, which browsers block from `file://` pages.
+
 ## Games in This Repo
 
 ### Battleship
-A classic Battleship implementation playable in your terminal, with a bot and local multiplayer support.
+Classic Battleship, playable in your terminal or your browser, with a bot opponent and local multiplayer support.
 
 **Features**
 - Classic Battleship gameplay (place ships, call shots, sink the enemy fleet)
-- Single-player mode vs. computer AI
-- Two-player local mode
-- Coordinate-based input (e.g., A5) with input validation
+- Single-player mode vs. a bot opponent that hunts adjacent cells once it lands a hit, rather than firing blindly
+- Coordinate-based input/clicks with validation
+- Browser version includes a "Randomize My Fleet" option for instant setup
 
-**Run it**
+**Play it in your browser**
+
+    docs/battleship.html
+    (via the local server described above, or the live site)
+
+**Run it in your terminal**
 
     cd mainfile/Battleship
     python3 Set_Up_Ships.py
 
 **Gameplay basics**
-- Board coordinates use letters for rows and numbers for columns (e.g., A1, B7).
-- Ship sizes: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (3), and Patrol Boat (2).
-- Enter a coordinate to fire at (e.g., E4); the game reports Hit, Miss, or Sunk.
+- Board coordinates use letters for columns and numbers for rows (e.g., A1, B7).
+- Ship sizes: Carrier (5), Battleship (4), Destroyer (3), Submarine (3), and Patrol Boat (2).
+- Fire at a coordinate; the game reports Hit, Miss, or Sunk.
 - Win by sinking every ship in the opposing fleet.
 
 ### The Questions
-A browser-based trivia game for 1–5 players (or solo against a computer opponent), inspired by classic wedge-collecting trivia board games. Runs entirely in a single HTML file — no install required.
+A browser-based trivia game for 1–5 players (or solo against computer opponents), inspired by classic wedge-collecting trivia board games. Runs entirely in a single HTML file — no install required.
 
 **Features**
 - A 36-space board with six trivia categories: Geography, History, Science, Entertainment, Sports, and Arts & Words
 - Roll a die, choose a direction, and answer whatever category you land on
 - Open-answer, multiple-choice, and true/false question formats
 - A "deciding question" mechanic — once you've collected all six wedges, the other players choose your final category
-- 1–5 player support, including a solo mode against a computer opponent
+- 1–5 player support, including any mix of human and bot players
 - Optional Hard Mode: missing a question in a category you've already won costs you that wedge
+- Optional Play to Last Place mode: keep playing until everyone but one player has finished
 
 **Play it**
 
-    cd mainfile/Questions
-    open The_Questions.html
+    docs/Questions/The_Questions.html
+    (via the local server, or the live site)
 
 ### Number Guesser
-A simple and fun guessing game where you try to guess a randomly selected number within a given range. Perfect for quick entertainment or learning the basics of game logic.
+A simple guessing game where you try to guess a randomly selected number within a given range. Playable in your terminal or your browser.
 
 **Features**
 - Simple number guessing mechanics
 - Feedback on each guess (too high, too low, or correct)
-- Adjustable difficulty levels
+- Adjustable range
 - Replay functionality
 
-**Run it**
+**Play it in your browser**
+
+    docs/numberguesser.html
+
+**Run it in your terminal**
 
     cd mainfile/NumberGuesser
-    python3 number_guesser.py
+    python3 Creator.py
 
 ### Chess
-A terminal-based chess game built from [python-chess](https://github.com/niklasf/python-chess) (A huge thanks to them), handling move legality, board state, and game rules. Includes an optional computer opponent, either a lightweight built-in bot or Stockfish, the open-source chess engine.
+A chess game built on [python-chess](https://github.com/niklasf/python-chess) (a huge thanks to them), handling move legality, board state, and game rules. Includes an optional computer opponent at three difficulty levels.
 
 **Features**
 - Full standard chess rules via `python-chess` (legal move generation, check/checkmate detection, castling, en passant, promotion)
-- Simple board setup and move-making interface
-- Play moves by typing the original square that the piece was on, and the square it is going to (E.g. e2e4). Castling is entered the same way — move your king two squares toward the rook (e.g. e1g1 for White kingside).
-- Resign at any time by typing `resign`, or offer a draw by typing `draw`
-- Optional bot opponent with three difficulty levels:
-  - **Easy** — a lightweight built-in minimax bot (~600 elo), no Stockfish required
-  - **Normal** — Stockfish, capped to roughly 1400 Elo
-  - **Hard** — Stockfish, capped to roughly 2000 Elo
-- Choose to play against the bot, pick its color (White, Black, or Random), and pick a difficulty level.
+- Play moves by typing (terminal) or clicking (browser) the square a piece is on, then the square it's moving to (e.g. e2e4). Castling is entered the same way — move your king two squares toward the rook.
+- Resign at any time, or offer a draw
+- Optional bot opponent, choice of color (White, Black, or Random), and difficulty level
 
-**Easy mode requires no extra setup** — it's a small built-in minimax bot with no external dependencies. **Normal and Hard modes require Stockfish to be installed separately** (it's a compiled chess engine, not a Python package — `pip install -r requirements.txt` won't get it for you). See [Installing Stockfish](#installing-stockfish) below. If Stockfish isn't found for Normal or Hard mode, the game falls back to human vs. human instead of crashing.
+**A note on difficulty — the terminal and browser versions work differently:**
+- **Terminal version:** Easy is a lightweight built-in minimax bot (~600 elo, no external dependencies). Normal (~1400 elo) and Hard (~2000 elo) hand off to the [Stockfish](https://stockfishchess.org/) engine as a separate process.
+- **Browser version:** since a browser can't launch an external engine process, all three difficulties (Easy, Normal, Hard) are the same homemade minimax bot at increasing search depth and decreasing blunder chance, with no Stockfish involved. It's a different bot than the terminal's Normal/Hard modes — meaningfully weaker at the top end than real Stockfish play, but fully self-contained and requires no install.
+- The browser version currently always promotes pawns to a queen; underpromotion isn't supported yet.
 
-**Run it**
+**Play it in your browser**
+
+    docs/chess.html
+
+**Run it in your terminal**
 
     cd mainfile/Chess
     python3 board.py
 
-When you start the game, you'll be asked whether you want to play against the bot, which color it should play (or Random), and which difficulty level (Easy, Normal, or Hard).
+When you start the terminal game, you'll be asked whether you want to play against the bot, which color it should play (or Random), and which difficulty level (Easy, Normal, or Hard). **Only the terminal version needs Stockfish installed** — the browser version needs nothing extra. See [Installing Stockfish](#installing-stockfish) below if you want to play the terminal version's Normal or Hard mode.
 
 #### Installing Stockfish
+*(terminal Chess only — the browser version doesn't need this)*
 
 **macOS**
 
@@ -119,26 +148,41 @@ Or download the executable from [stockfishchess.org/download](https://stockfishc
 Download a prebuilt binary from [stockfishchess.org/download](https://stockfishchess.org/download/), unzip it, and either add it to your PATH or set `STOCKFISH_PATH` in `mainfile/Chess/board.py` to the full path of the binary.
 
 ### Reaction Test
-A quick terminal game that measures how fast your reflexes are. It waits a random amount of time between 1 and 60 seconds, tells you to go, then reports how long it took you to press Enter.
+A quick game that measures how fast your reflexes are, in your terminal or your browser. It waits a random amount of time, tells you to go, then reports how long it took you to react.
 
 **Features**
-- Random wait time before the "NOW!" prompt appears
-- Measures and reports your reaction time in seconds
-- Simple, single-run terminal gameplay
+- Random wait time before the "go" signal
+- Measures and reports your reaction time
+- Simple, single-run gameplay
 
-**Run it**
+**Play it in your browser**
+
+    docs/reactiontest.html
+
+**Run it in your terminal**
 
     cd mainfile/Reactiontest
     python3 Reaction_test
 
 ## Requirements
-- **Battleship:** Python 3 or newer, and a terminal
-- **The Questions:** Any modern web browser
-- **Number Guesser:** Python 3 or newer, and a terminal
-- **Chess:** Python 3 or newer, and the `chess` package (see [Installation](#installation)). The [Stockfish](https://stockfishchess.org/download/) engine is only needed for Normal/Hard bot difficulty (see [Installing Stockfish](#installing-stockfish)); Easy mode needs nothing extra.
-- **Reaction Test:** Python 3 or newer, and a terminal
+- **Browser versions (Battleship, The Questions, Number Guesser, Chess, Reaction Test):** any modern web browser. No installs required. First load fetches the Pyodide runtime (and, for Chess, the `python-chess` package), so an internet connection is needed at least once.
+- **Terminal Battleship:** Python 3 or newer, and a terminal
+- **Terminal Number Guesser:** Python 3 or newer, and a terminal
+- **Terminal Chess:** Python 3 or newer, and the `chess` package (see [Installation](#installation)). The [Stockfish](https://stockfishchess.org/download/) engine is only needed for Normal/Hard bot difficulty (see [Installing Stockfish](#installing-stockfish)); Easy mode needs nothing extra.
+- **Terminal Reaction Test:** Python 3 or newer, and a terminal
 
 ## Installation
+
+**To play in your browser**, either visit the live site (link at the top of this README) or clone the repo and serve the `docs/` folder locally:
+
+    git clone https://github.com/RedPandaGuy1234/Games
+    cd Games/docs
+    python3 -m http.server 8000
+
+Then open `http://localhost:8000/index.html`.
+
+**To play the terminal versions:**
+
 1. Clone the repository:
 
        git clone https://github.com/RedPandaGuy1234/Games
@@ -147,11 +191,11 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
 
        cd Games
 
-3. Install dependencies (needed for Chess):
+3. Install dependencies (needed for terminal Chess):
 
        pip install -r requirements.txt
 
-4. If you want to play Chess against the bot on Normal or Hard difficulty, also install the Stockfish engine — see [Installing Stockfish](#installing-stockfish). Easy mode works without it.
+4. If you want to play terminal Chess against the bot on Normal or Hard difficulty, also install the Stockfish engine — see [Installing Stockfish](#installing-stockfish). Easy mode works without it.
 
 5. Regularly update it:
 
@@ -163,7 +207,7 @@ A quick terminal game that measures how fast your reflexes are. It waits a rando
 This project is released under the GPL-3.0 License. See [LICENSE](LICENSE) for details. This license applies repo-wide unless a specific game's folder states otherwise.
 
 ## Credits
-This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess), the [Stockfish](https://github.com/official-stockfish/Stockfish) chess engine, and black for formatting: [black](https://github.com/psf/black).
+This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess), the [Stockfish](https://github.com/official-stockfish/Stockfish) chess engine, [Pyodide](https://pyodide.org) for running Python in the browser, and black for formatting: [black](https://github.com/psf/black).
 
 ## Contact
 Maintainer: RedPandaGuy1234
