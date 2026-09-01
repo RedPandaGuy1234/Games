@@ -82,6 +82,8 @@
   }
   .square.light{background:var(--sq-light);}
   .square.dark{background:var(--sq-dark);}
+  .square.piece-white{color:#fdfdfd; text-shadow:0 0 1px #000, 0 0 2px #000, 0 0 3px rgba(0,0,0,.6);}
+  .square.piece-black{color:#161616; text-shadow:0 0 1px #fff, 0 0 2px #fff;}
   .square.selected::after{
     content:''; position:absolute; inset:2px; border-radius:4px;
     box-shadow:inset 0 0 0 3px var(--sq-select);
@@ -366,7 +368,13 @@ def board_squares():
     for square in chess.SQUARES:
         piece = board.piece_at(square)
         name = chess.square_name(square)
-        squares[name] = PIECE_UNICODE[(piece.piece_type, piece.color)] if piece else ""
+        if piece is None:
+            squares[name] = None
+        else:
+            squares[name] = {
+                "symbol": PIECE_UNICODE[(piece.piece_type, piece.color)],
+                "color": "white" if piece.color == chess.WHITE else "black",
+            }
     return squares
 
 def get_status():
@@ -457,14 +465,18 @@ function applyStatus(status){
   for(const squareName in status.squares){
     const el = document.getElementById(`sq-${squareName}`);
     if(!el) continue;
-    el.textContent = status.squares[squareName];
-    el.classList.remove('selected', 'target', 'has-piece');
+    const info = status.squares[squareName];
+    el.textContent = info ? info.symbol : '';
+    el.classList.remove('selected', 'target', 'has-piece', 'piece-white', 'piece-black');
+    if(info){
+      el.classList.add(info.color === 'white' ? 'piece-white' : 'piece-black');
+    }
     if(status.selected_square === squareName){
       el.classList.add('selected');
     }
     if(status.legal_targets.includes(squareName)){
       el.classList.add('target');
-      if(status.squares[squareName] !== ''){
+      if(info){
         el.classList.add('has-piece');
       }
     }
