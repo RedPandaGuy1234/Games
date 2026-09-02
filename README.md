@@ -3,7 +3,6 @@
 A small collection of games, built by me. This repo started as a single Python Battleship implementation and has grown into a home for multiple games — most of them playable both in your terminal and right in your browser.
 
 **Play in your browser:** https://redpandaguy1234.github.io/Games/
-*(once GitHub Pages is enabled for this repo — see [Playing in Your Browser](#playing-in-your-browser) below)*
 
 ## Table of Contents
 - [Playing in Your Browser](#playing-in-your-browser)
@@ -23,7 +22,7 @@ A small collection of games, built by me. This repo started as a single Python B
 
 Battleship, Number Guesser, Chess, and Reaction Test all have browser versions in the `docs/` folder, alongside the original terminal versions in `mainfile/`. The Questions has only ever lived in the browser.
 
-The browser versions run entirely client-side using [Pyodide](https://pyodide.org) (Python compiled to WebAssembly) — your actual game logic runs as real Python inside the page, not a JavaScript rewrite. No installation, no Python setup, no server of your own required once it's deployed to GitHub Pages.
+The browser versions run entirely client-side using [Pyodide](https://pyodide.org) (Python compiled to WebAssembly) — your actual game logic runs as real Python inside the page, not a JavaScript rewrite. No installation, no Python setup, no server of your own required.
 
 **To test the browser versions locally**, open a terminal in the `docs/` folder and run:
 
@@ -50,7 +49,7 @@ Classic Battleship, playable in your terminal or your browser, with a bot oppone
 **Run it in your terminal**
 
     cd mainfile/Battleship
-    python3 Battleship.py
+    python3 Set_Up_Ships.py
 
 **Gameplay basics**
 - Board coordinates use letters for columns and numbers for rows (e.g., A1, B7).
