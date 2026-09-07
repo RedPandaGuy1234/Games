@@ -17,6 +17,7 @@
     --ship:#7CB9F2;
     --hit:#B4552A;
     --miss:rgba(255,255,255,.35);
+    --remaining:#9B5DE5;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -71,6 +72,7 @@
   .cell.hit{background:var(--hit);}
   .cell.miss{background:transparent;}
   .cell.miss::after{content:''; width:8px; height:8px; border-radius:50%; background:var(--miss);}
+  .cell.remaining{background:var(--remaining);}
   .cell.selected{outline:2px solid var(--gold);}
   .cell.static{cursor:default;}
   .placement-panel{
@@ -434,6 +436,7 @@ def get_player_board_view():
 
 def get_bot_board_view():
     view = []
+    reveal_remaining = state["winner"] == "bot"
     for r in range(10):
         row = []
         for c in range(10):
@@ -443,6 +446,8 @@ def get_bot_board_view():
                 row.append("hit")
             elif shot:
                 row.append("miss")
+            elif cell is not None and reveal_remaining:
+                row.append("remaining")
             else:
                 row.append("empty")
         view.append(row)
@@ -538,6 +543,7 @@ function renderBoard(prefix, boardView){
       if(status === 'ship') cell.classList.add('ship');
       else if(status === 'hit') cell.classList.add('hit');
       else if(status === 'miss') cell.classList.add('miss');
+      else if(status === 'remaining') cell.classList.add('remaining');
     }
   }
 }
