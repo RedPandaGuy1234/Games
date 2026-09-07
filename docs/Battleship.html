@@ -80,6 +80,16 @@
   }
   .ship-checklist{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; font-size:11.5px; color:var(--cream-dim);}
   .ship-checklist span.done{color:var(--gold); font-weight:700;}
+  .ship-status-list{
+    display:flex; flex-direction:column; gap:4px;
+    font-size:11.5px; color:var(--cream-dim);
+    background:rgba(0,0,0,.15); border:1px solid rgba(255,255,255,.08);
+    border-radius:9px; padding:9px 12px; width:180px;
+  }
+  .ship-status-item{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .ship-status-item .status{font-weight:700; font-size:10.5px; letter-spacing:.03em; text-transform:uppercase; color:var(--cream-dim);}
+  .ship-status-item.sunk .name{color:rgba(255,255,255,.4); text-decoration:line-through;}
+  .ship-status-item.sunk .status{color:var(--hit);}
 </style>
 </head>
 <body>
@@ -105,10 +115,12 @@
   <div class="boards">
     <div class="board-block">
       <div class="board-title">Your Fleet</div>
+      <div class="ship-status-list" id="playerShipStatus"></div>
       <div class="board-grid" id="playerGrid"></div>
     </div>
     <div class="board-block">
       <div class="board-title">Enemy Waters</div>
+      <div class="ship-status-list" id="botShipStatus"></div>
       <div class="board-grid" id="botGrid"></div>
     </div>
   </div>
@@ -143,6 +155,8 @@ def new_game_state():
         "player_shots": set(),
         "bot_shots": set(),
         "bot_hunt_queue": [],
+        "bot_active_hits": [],
+        "bot_hunting_ship": None,
         "message": "",
         "winner": None,
     }
@@ -299,6 +313,36 @@ def add_hunt_targets(c, r):
         if 0 <= nc < 10 and 0 <= nr < 10 and (nc, nr) not in state["bot_shots"] and (nc, nr) not in state["bot_hunt_queue"]:
             state["bot_hunt_queue"].append((nc, nr))
 
+def recompute_hunt_queue():
+    # Once two or more hits on the same ship are known, only keep hunt
+    # targets that continue along the ship's revealed orientation — a real
+    # ship can't bend, so cells off that line are never worth trying.
+    hits = state["bot_active_hits"]
+    if not hits:
+        return
+    if len(hits) == 1:
+        c, r = hits[0]
+        add_hunt_targets(c, r)
+        return
+
+    rows = set(r for c, r in hits)
+    cols = set(c for c, r in hits)
+    candidates = []
+    if len(rows) == 1:
+        r = next(iter(rows))
+        cs = [c for c, _ in hits]
+        candidates = [(min(cs) - 1, r), (max(cs) + 1, r)]
+    elif len(cols) == 1:
+        c = next(iter(cols))
+        rs = [rr for _, rr in hits]
+        candidates = [(c, min(rs) - 1), (c, max(rs) + 1)]
+
+    state["bot_hunt_queue"] = [
+        (nc, nr)
+        for nc, nr in candidates
+        if 0 <= nc < 10 and 0 <= nr < 10 and (nc, nr) not in state["bot_shots"]
+    ]
+
 def choose_bot_shot():
     while state["bot_hunt_queue"]:
         c, r = state["bot_hunt_queue"].pop(0)
@@ -320,12 +364,22 @@ def bot_turn():
     row_num = r + 1
     if hit_ship:
         cells = state["player_ships"][hit_ship]
-        add_hunt_targets(c, r)
+
+        if state["bot_hunting_ship"] != hit_ship:
+            # A different ship than the one we were tracking — start a
+            # fresh hit cluster so orientation is computed for this ship.
+            state["bot_active_hits"] = []
+            state["bot_hunting_ship"] = hit_ship
+        state["bot_active_hits"].append((c, r))
+
         if cells.issubset(state["bot_shots"]):
             state["message"] += f" The enemy fires at {col_letter}{row_num} — hit, and they sank your {ship_name(hit_ship)}!"
             state["bot_hunt_queue"] = [t for t in state["bot_hunt_queue"] if t not in cells]
+            state["bot_active_hits"] = []
+            state["bot_hunting_ship"] = None
         else:
             state["message"] += f" The enemy fires at {col_letter}{row_num} — hit!"
+            recompute_hunt_queue()
         if all_sunk(state["player_ships"], state["bot_shots"]):
             state["winner"] = "bot"
             state["message"] += " Your fleet has been destroyed. The enemy wins."
@@ -397,6 +451,13 @@ def get_bot_board_view():
 def placed_ship_names():
     return [name for sid, name, length in SHIPS if sid in state["player_ships"]]
 
+def get_sunk_list(ships, shots):
+    sunk = []
+    for sid, name, length in SHIPS:
+        if sid in ships and ships[sid].issubset(shots):
+            sunk.append(name)
+    return sunk
+
 def get_status():
     ship = current_ship()
     payload = {
@@ -409,6 +470,8 @@ def get_status():
         "placed_ships": placed_ship_names(),
         "player_board": get_player_board_view(),
         "bot_board": get_bot_board_view(),
+        "player_ships_sunk": get_sunk_list(state["player_ships"], state["bot_shots"]),
+        "bot_ships_sunk": get_sunk_list(state["bot_ships"], state["player_shots"]) if state["phase"] == "battle" else [],
     }
     return json.dumps(payload)
 
@@ -426,6 +489,8 @@ const shipChecklist = document.getElementById('shipChecklist');
 const cancelBtn = document.getElementById('cancelBtn');
 const randomizeBtn = document.getElementById('randomizeBtn');
 const newGameBtn = document.getElementById('newGameBtn');
+const playerShipStatusEl = document.getElementById('playerShipStatus');
+const botShipStatusEl = document.getElementById('botShipStatus');
 
 const ALL_SHIP_NAMES = ["Patrol Boat", "Destroyer", "Submarine", "Battleship", "Carrier"];
 
@@ -484,6 +549,20 @@ function renderChecklist(placedShips){
   }).join('');
 }
 
+function renderShipStatus(container, sunkNames, placeholder){
+  if(placeholder){
+    container.innerHTML = `<div class="ship-status-item"><span class="name">${placeholder}</span></div>`;
+    return;
+  }
+  container.innerHTML = ALL_SHIP_NAMES.map(name => {
+    const sunk = sunkNames.includes(name);
+    return `<div class="ship-status-item ${sunk ? 'sunk' : ''}">
+      <span class="name">${name}</span>
+      <span class="status">${sunk ? 'Sunk' : 'Afloat'}</span>
+    </div>`;
+  }).join('');
+}
+
 function applyStatus(status){
   messageEl.textContent = status.message;
 
@@ -498,6 +577,9 @@ function applyStatus(status){
 
   renderBoard('player', status.player_board);
   renderBoard('bot', status.bot_board);
+
+  renderShipStatus(playerShipStatusEl, status.player_ships_sunk, status.phase === 'placing' ? 'Placing fleet…' : null);
+  renderShipStatus(botShipStatusEl, status.bot_ships_sunk, status.phase === 'placing' ? 'Unknown until battle starts' : null);
 
   playerGridEl.querySelectorAll('.cell').forEach(cell => {
     cell.style.cursor = (status.phase === 'placing') ? 'pointer' : 'default';
