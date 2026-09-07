@@ -69,10 +69,9 @@ A browser-based trivia game for 1–5 players (or solo against computer opponent
 - Optional Hard Mode: missing a question in a category you've already won costs you that wedge
 - Optional Play to Last Place mode: keep playing until everyone but one player has finished
 
-**Play it**
+**Play it in your browser (through terminal)**
 
-    docs/Questions/The_Questions.html
-    (via the local server, or the live site)
+    open docs/Questions/The_Questions.html
 
 ### Number Guesser
 A simple guessing game where you try to guess a randomly selected number within a given range. Playable in your terminal or your browser.
