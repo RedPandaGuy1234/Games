@@ -24,12 +24,12 @@ Battleship, Number Guesser, Chess, and Reaction Test all have browser versions i
 
 The browser versions run entirely client-side using [Pyodide](https://pyodide.org) (Python compiled to WebAssembly) — your actual game logic runs as real Python inside the page, not a JavaScript rewrite. No installation, no Python setup, no server of your own required. (The Questions is the one exception — it's plain HTML/JS with no Pyodide dependency.)
 
-**To test the browser versions locally**, open a terminal in the `docs/` folder and run:
-
-    python3 -m http.server 8000
-
-Then visit `http://localhost:8000/index.html` in your browser. Opening the HTML files directly (double-clicking them, or a `file://` URL) will not work for the Pyodide-based games — Pyodide needs to fetch its WebAssembly runtime over HTTP, which browsers block from `file://` pages. (The Questions, having no Pyodide dependency, will actually work fine even opened directly — but the local server is still the recommended way to test everything consistently.)
-
+**To test the browser versions locally**, run:
+```
+cd docs
+open index.html
+```
+This allows you to choose what ever game you want to play locally in your browser. If you do not have a browser, you can play the games (except for The Questions) in your terminal, with instructions on how to do so underneath.  
 ## Games in This Repo
 
 ### Battleship
@@ -40,11 +40,6 @@ Classic Battleship, playable in your terminal or your browser, with a bot oppone
 - Single-player mode vs. a bot opponent that hunts adjacent cells once it lands a hit, rather than firing blindly
 - Coordinate-based input/clicks with validation
 - Browser version includes a "Randomize My Fleet" option for instant setup
-
-**Play it in your browser**
-
-    docs/battleship.html
-    (via the local server described above, or the live site)
 
 **Run it in your terminal**
 
@@ -70,9 +65,10 @@ A browser-based trivia game for 1–5 players (or solo against computer opponent
 - Optional Play to Last Place mode: keep playing until everyone but one player has finished
 
 **Play it**
-
-    docs/thequestions.html
-    (via the local server, or the live site)
+```
+cd docs
+open The Questions
+```
 
 ### Number Guesser
 A simple guessing game where you try to guess a randomly selected number within a given range. Playable in your terminal or your browser.
@@ -82,10 +78,6 @@ A simple guessing game where you try to guess a randomly selected number within 
 - Feedback on each guess (too high, too low, or correct)
 - Adjustable range
 - Replay functionality
-
-**Play it in your browser**
-
-    docs/numberguesser.html
 
 **Run it in your terminal**
 
@@ -104,11 +96,7 @@ A chess game built on [python-chess](https://github.com/niklasf/python-chess) (a
 **A note on difficulty — the terminal and browser versions work differently:**
 - **Terminal version:** Easy is a lightweight built-in minimax bot (~600 elo, no external dependencies). Normal (~1400 elo) and Hard (~2000 elo) hand off to the [Stockfish](https://stockfishchess.org/) engine as a separate process.
 - **Browser version:** since a browser can't launch an external engine process, all three difficulties (Easy, Normal, Hard) are the same homemade minimax bot at increasing search depth and decreasing blunder chance, with no Stockfish involved. It's a different bot than the terminal's Normal/Hard modes — meaningfully weaker at the top end than real Stockfish play, but fully self-contained and requires no install.
-- The browser version currently always promotes pawns to a queen; underpromotion isn't supported yet.
-
-**Play it in your browser**
-
-    docs/chess.html
+- The browser version currently always promotes pawns to a queen; underpromotion isn't supported.
 
 **Run it in your terminal**
 
@@ -154,10 +142,6 @@ A quick game that measures how fast your reflexes are, in your terminal or your 
 - Measures and reports your reaction time
 - Simple, single-run gameplay
 
-**Play it in your browser**
-
-    docs/reactiontest.html
-
 **Run it in your terminal**
 
     cd mainfile/Reactiontest
@@ -172,13 +156,12 @@ A quick game that measures how fast your reflexes are, in your terminal or your 
 
 ## Installation
 
-**To play in your browser**, either visit the live site (link at the top of this README) or clone the repo and serve the `docs/` folder locally:
+**To play in your browser**, either visit the live site (link at the top of this README) or clone the repo and use the code mentioned above and here to open the menu and select your game to play.
 
     git clone https://github.com/RedPandaGuy1234/Games
     cd Games/docs
-    python3 -m http.server 8000
+    open index.html
 
-Then open `http://localhost:8000/index.html`.
 
 **To play the terminal versions:**
 
