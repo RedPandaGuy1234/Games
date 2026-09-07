@@ -20,15 +20,15 @@ A small collection of games, built by me. This repo started as a single Python B
 
 ## Playing in Your Browser
 
-Battleship, Number Guesser, Chess, and Reaction Test all have browser versions in the `docs/` folder, alongside the original terminal versions in `mainfile/`. The Questions has only ever lived in the browser.
+Battleship, Number Guesser, Chess, and Reaction Test all have browser versions in the `docs/` folder, alongside the original terminal versions in `mainfile/`. The Questions has only ever lived in the browser, and its files live in `docs/` too.
 
-The browser versions run entirely client-side using [Pyodide](https://pyodide.org) (Python compiled to WebAssembly) — your actual game logic runs as real Python inside the page, not a JavaScript rewrite. No installation, no Python setup, no server of your own required.
+The browser versions run entirely client-side using [Pyodide](https://pyodide.org) (Python compiled to WebAssembly) — your actual game logic runs as real Python inside the page, not a JavaScript rewrite. No installation, no Python setup, no server of your own required. (The Questions is the one exception — it's plain HTML/JS with no Pyodide dependency.)
 
 **To test the browser versions locally**, open a terminal in the `docs/` folder and run:
 
     python3 -m http.server 8000
 
-Then visit `http://localhost:8000/index.html` in your browser. Opening the HTML files directly (double-clicking them, or a `file://` URL) will not work — Pyodide needs to fetch its WebAssembly runtime over HTTP, which browsers block from `file://` pages.
+Then visit `http://localhost:8000/index.html` in your browser. Opening the HTML files directly (double-clicking them, or a `file://` URL) will not work for the Pyodide-based games — Pyodide needs to fetch its WebAssembly runtime over HTTP, which browsers block from `file://` pages. (The Questions, having no Pyodide dependency, will actually work fine even opened directly — but the local server is still the recommended way to test everything consistently.)
 
 ## Games in This Repo
 
@@ -69,9 +69,10 @@ A browser-based trivia game for 1–5 players (or solo against computer opponent
 - Optional Hard Mode: missing a question in a category you've already won costs you that wedge
 - Optional Play to Last Place mode: keep playing until everyone but one player has finished
 
-**Play it in your browser (through terminal)**
+**Play it**
 
-    open docs/Questions/The_Questions.html
+    docs/thequestions.html
+    (via the local server, or the live site)
 
 ### Number Guesser
 A simple guessing game where you try to guess a randomly selected number within a given range. Playable in your terminal or your browser.
@@ -163,7 +164,7 @@ A quick game that measures how fast your reflexes are, in your terminal or your 
     python3 Reaction_test
 
 ## Requirements
-- **Browser versions (Battleship, The Questions, Number Guesser, Chess, Reaction Test):** any modern web browser. No installs required. First load fetches the Pyodide runtime (and, for Chess, the `python-chess` package), so an internet connection is needed at least once.
+- **Browser versions (Battleship, The Questions, Number Guesser, Chess, Reaction Test):** any modern web browser. No installs required. First load fetches the Pyodide runtime (and, for Chess, the `python-chess` package), so an internet connection is needed at least once. The Questions has no Pyodide dependency and needs nothing beyond the browser itself.
 - **Terminal Battleship:** Python 3 or newer, and a terminal
 - **Terminal Number Guesser:** Python 3 or newer, and a terminal
 - **Terminal Chess:** Python 3 or newer, and the `chess` package (see [Installation](#installation)). The [Stockfish](https://stockfishchess.org/download/) engine is only needed for Normal/Hard bot difficulty (see [Installing Stockfish](#installing-stockfish)); Easy mode needs nothing extra.
