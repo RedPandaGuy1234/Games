@@ -172,6 +172,15 @@ def print_board(board, ships, shots, reveal):
         print(f"{row_label} " + "  ".join(row_cells))
 
 
+def print_ship_status(title, ships, shots):
+    print(f"\n{title}:")
+    for ship_id, name, length in SHIPS:
+        if ship_id not in ships:
+            continue
+        sunk = ships[ship_id].issubset(shots)
+        print(f"  {'[SUNK]' if sunk else '[    ]'} {name}")
+
+
 def add_hunt_targets(hunt_queue, shots, c, r):
     for dc, dr in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
         nc, nr = c + dc, r + dr
@@ -182,6 +191,36 @@ def add_hunt_targets(hunt_queue, shots, c, r):
             and (nc, nr) not in hunt_queue
         ):
             hunt_queue.append((nc, nr))
+
+
+def recompute_hunt_queue(hunt_queue, shots, active_hits):
+    """Once two or more hits on the same ship are known, only keep hunt
+    targets that continue along the ship's revealed orientation — a real
+    ship can't bend, so cells off that line are never worth trying."""
+    if not active_hits:
+        return
+    if len(active_hits) == 1:
+        c, r = active_hits[0]
+        add_hunt_targets(hunt_queue, shots, c, r)
+        return
+
+    rows = set(r for c, r in active_hits)
+    cols = set(c for c, r in active_hits)
+    candidates = []
+    if len(rows) == 1:
+        r = next(iter(rows))
+        cs = [c for c, _ in active_hits]
+        candidates = [(min(cs) - 1, r), (max(cs) + 1, r)]
+    elif len(cols) == 1:
+        c = next(iter(cols))
+        rs = [rr for _, rr in active_hits]
+        candidates = [(c, min(rs) - 1), (c, max(rs) + 1)]
+
+    hunt_queue[:] = [
+        (nc, nr)
+        for nc, nr in candidates
+        if 0 <= nc < 10 and 0 <= nr < 10 and (nc, nr) not in shots
+    ]
 
 
 def choose_bot_shot(hunt_queue, shots):
@@ -225,7 +264,7 @@ def player_turn(bot_board, bot_ships, player_shots):
     return all_sunk(bot_ships, player_shots)
 
 
-def bot_turn(player_board, player_ships, bot_shots, hunt_queue):
+def bot_turn(player_board, player_ships, bot_shots, hunt_queue, active_hits, hunting_ship):
     c, r = choose_bot_shot(hunt_queue, bot_shots)
     bot_shots.add((c, r))
     col_letter = COLS[c]
@@ -233,14 +272,24 @@ def bot_turn(player_board, player_ships, bot_shots, hunt_queue):
     hit_ship = ship_at(player_ships, c, r)
     if hit_ship:
         cells = player_ships[hit_ship]
-        add_hunt_targets(hunt_queue, bot_shots, c, r)
+
+        if hunting_ship["id"] != hit_ship:
+            # A different ship than the one we were tracking — start a
+            # fresh hit cluster so orientation is computed for this ship.
+            active_hits.clear()
+            hunting_ship["id"] = hit_ship
+        active_hits.append((c, r))
+
         if cells.issubset(bot_shots):
             print(
                 f"The enemy fires at {col_letter}{row_num} — hit, and they sank your {ship_name(hit_ship)}!"
             )
             hunt_queue[:] = [t for t in hunt_queue if t not in cells]
+            active_hits.clear()
+            hunting_ship["id"] = None
         else:
             print(f"The enemy fires at {col_letter}{row_num} — hit!")
+            recompute_hunt_queue(hunt_queue, bot_shots, active_hits)
     else:
         print(f"The enemy fires at {col_letter}{row_num} — miss.")
 
@@ -258,19 +307,25 @@ def play_game():
     player_shots = set()
     bot_shots = set()
     hunt_queue = []
+    active_hits = []
+    hunting_ship = {"id": None}
 
     while True:
         print("\nYour Fleet:")
         print_board(player_board, player_ships, bot_shots, reveal=True)
         print("\nEnemy Waters:")
         print_board(bot_board, bot_ships, player_shots, reveal=False)
+        print_ship_status("Your Fleet Status", player_ships, bot_shots)
+        print_ship_status("Enemy Fleet Status", bot_ships, player_shots)
 
         player_won = player_turn(bot_board, bot_ships, player_shots)
         if player_won:
             print("\nYou sank the entire enemy fleet! You win!")
             break
 
-        bot_won = bot_turn(player_board, player_ships, bot_shots, hunt_queue)
+        bot_won = bot_turn(
+            player_board, player_ships, bot_shots, hunt_queue, active_hits, hunting_ship
+        )
         if bot_won:
             print("\nYour fleet has been destroyed. The enemy wins.")
             break
@@ -280,6 +335,8 @@ def play_game():
     print_board(player_board, player_ships, bot_shots, reveal=True)
     print("\nEnemy Waters:")
     print_board(bot_board, bot_ships, player_shots, reveal=True)
+    print_ship_status("Your Fleet Status", player_ships, bot_shots)
+    print_ship_status("Enemy Fleet Status", bot_ships, player_shots)
 
 
 if __name__ == "__main__":
