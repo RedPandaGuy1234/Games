@@ -1,7 +1,11 @@
-Games:
+Games on the web:
   any-glob-to-any-file: 
-  - "Game"
+  - "docs"
 
 Github:
     any-glob-to-file:
     - ".github"
+
+Games in terminal: 
+  any-glob-to-any-file:
+  - "mainfile"
