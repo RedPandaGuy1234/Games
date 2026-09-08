@@ -13,3 +13,7 @@ There are some different ways to contribute:
 2. Start creating a new game (Needs approval in the discussions tab first)
 
 Please include tests where applicable, follow the existing code style for whichever game you're touching, and keep each game's files self-contained within its own folder so that we can move it to be deployed once it is fully ready.
+
+**WHEN YOU CONTRIBUTE**
+
+Name the pull request starting with: "chore:" If this is a PR to fix something, start with "fix:",
