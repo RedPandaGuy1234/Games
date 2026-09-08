@@ -14,17 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v7
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v7
-      with:
-        node-version: '18'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build
-      run: npm run build --if-present
-
     - name: Create Release
       uses: actions/create-release@v1
       env:
