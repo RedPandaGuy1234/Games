@@ -16,4 +16,4 @@ Please include tests where applicable, follow the existing code style for whiche
 
 **WHEN YOU CONTRIBUTE**
 
-Name the pull request starting with: "chore:" If this is a PR to fix something, start with "fix:",
+Name the pull request starting with: "chore:" If this is a PR to fix something, start with "fix:", if it is the start or continuation of an addition, start with "feat:", and lastly, if it is a major change (like finalizing a new addition), start with "feat!:"
