@@ -192,7 +192,7 @@ This project is released under the GPL-3.0 License. See [LICENSE](LICENSE) for d
 Please look at the [contributing](CONTRIBUTING.md) document for further details.
 
 ## Credits
-This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess), the [Stockfish](https://github.com/official-stockfish/Stockfish) chess engine, [Pyodide](https://pyodide.org) for running Python in the browser, and black for formatting: [black](https://github.com/psf/black).
+This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess), the [Stockfish](https://github.com/official-stockfish/Stockfish) chess engine, [Pyodide](https://pyodide.org) for running Python in the browser, and [black](https://github.com/psf/black) for formatting.
 
 ## Contact
 Maintainer: RedPandaGuy1234
