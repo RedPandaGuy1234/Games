@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/RedPandaGuy1234/Games/compare/v1.0.1...v1.0.2) (2026-09-10)
+
+
+### Bug Fixes
+
+* Update pull request naming guidelines ([5f8007b](https://github.com/RedPandaGuy1234/Games/commit/5f8007b16677a312c8a2157b63c5bad337ae13c7))
+
 ## [1.0.1](https://github.com/RedPandaGuy1234/Games/compare/v1.0.0...v1.0.1) (2026-09-10)
 
 
