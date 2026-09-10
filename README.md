@@ -189,7 +189,7 @@ A quick game that measures how fast your reflexes are, in your terminal or your 
 This project is released under the GPL-3.0 License. See [LICENSE](LICENSE) for details. This license applies repo-wide unless a specific game's folder states otherwise.
 
 ## Contributing
-Please look at the [contributing](Contributing.md) document for further details.
+Please look at the [contributing](CONTRIBUTING.md) document for further details.
 
 ## Credits
 This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess), the [Stockfish](https://github.com/official-stockfish/Stockfish) chess engine, [Pyodide](https://pyodide.org) for running Python in the browser, and black for formatting: [black](https://github.com/psf/black).
