@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/RedPandaGuy1234/Games/compare/v1.2.0...v1.2.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* Update Wordle description in index.html ([b50b2d5](https://github.com/RedPandaGuy1234/Games/commit/b50b2d563fe22211c705b39d218c769ebb249572))
+
 ## [1.2.0](https://github.com/RedPandaGuy1234/Games/compare/v1.1.0...v1.2.0) (2026-09-11)
 
 
