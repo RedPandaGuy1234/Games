@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3](https://github.com/RedPandaGuy1234/Games/compare/v1.3.2...v1.3.3) (2026-09-11)
+
+
+### Bug Fixes
+
+* Improve error message for failed valid words fetch ([830b5b5](https://github.com/RedPandaGuy1234/Games/commit/830b5b59ee8bf68485ef3e2d904fb38d51204dcc))
+
 ## [1.3.2](https://github.com/RedPandaGuy1234/Games/compare/v1.3.1...v1.3.2) (2026-09-11)
 
 
