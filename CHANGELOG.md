@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/RedPandaGuy1234/Games/compare/v1.3.0...v1.3.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* Modify Wordle badge text to indicate solo development ([3152e7f](https://github.com/RedPandaGuy1234/Games/commit/3152e7f8558b4645ec6916ef2b03f200f70a9081))
+
 ## [1.3.0](https://github.com/RedPandaGuy1234/Games/compare/v1.2.1...v1.3.0) (2026-09-11)
 
 
