@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.4](https://github.com/RedPandaGuy1234/Games/compare/v1.3.3...v1.3.4) (2026-09-11)
+
+
+### Bug Fixes
+
+* Fix JSON formatting in release-please-config.json ([54bf6c2](https://github.com/RedPandaGuy1234/Games/commit/54bf6c22a6e53a36425ca593c0b4b1ce24382dc9))
+
 ## [1.3.3](https://github.com/RedPandaGuy1234/Games/compare/v1.3.2...v1.3.3) (2026-09-11)
 
 
