@@ -7,6 +7,3 @@ if response.status_code == 200:
     Valid_Words = response.text.splitlines()
 else:
     Valid_Words = []
-
-# This is a test to see if it works, will be deleted later.
-print(Valid_Words)
