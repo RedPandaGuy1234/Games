@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/RedPandaGuy1234/Games/compare/v1.0.2...v1.1.0) (2026-09-11)
+
+
+### Features
+
+* add Valid Words for Wordle ([dad18a6](https://github.com/RedPandaGuy1234/Games/commit/dad18a6fda221bae7e820b895ad6c963cc3faf3f))
+
 ## [1.0.2](https://github.com/RedPandaGuy1234/Games/compare/v1.0.1...v1.0.2) (2026-09-10)
 
 
