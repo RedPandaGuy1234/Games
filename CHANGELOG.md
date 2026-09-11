@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/RedPandaGuy1234/Games/compare/v1.1.0...v1.2.0) (2026-09-11)
+
+
+### Features
+
+* Add functionality to load valid words from URL ([917dd9f](https://github.com/RedPandaGuy1234/Games/commit/917dd9f37e3048d8850ec0e12b7bc8cfbd16e2f6))
+* Add requests library to requirements ([29430fc](https://github.com/RedPandaGuy1234/Games/commit/29430fc707aa19b90975f97137a7fa0329890b30))
+* Add Wordle game card to index.html ([deba7e8](https://github.com/RedPandaGuy1234/Games/commit/deba7e8fcb965a2e71f732ba7c55e41c5b207cb8))
+
+
+### Bug Fixes
+
+* Fetch Valid_Words.txt from remote URL ([f7204dc](https://github.com/RedPandaGuy1234/Games/commit/f7204dc9d9e9c416b54886462d9646bf8575774e))
+
 ## [1.1.0](https://github.com/RedPandaGuy1234/Games/compare/v1.0.2...v1.1.0) (2026-09-11)
 
 
