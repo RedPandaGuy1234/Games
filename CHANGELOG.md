@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/RedPandaGuy1234/Games/compare/v1.2.1...v1.3.0) (2026-09-11)
+
+
+### Features
+
+* Implement error handling for Valid_Words fetch ([1e8b8e4](https://github.com/RedPandaGuy1234/Games/commit/1e8b8e4388d9809a8df97fd8f03b5ea55944db73))
+
 ## [1.2.1](https://github.com/RedPandaGuy1234/Games/compare/v1.2.0...v1.2.1) (2026-09-11)
 
 
