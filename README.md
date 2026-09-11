@@ -173,7 +173,7 @@ A quick game that measures how fast your reflexes are, in your terminal or your 
 
        cd Games
 
-3. Install dependencies (needed for terminal Chess):
+3. Install dependencies (needed for terminal Chess and terminal Wordle):
 
        pip install -r requirements.txt
 
@@ -192,7 +192,7 @@ This project is released under the GPL-3.0 License. See [LICENSE](LICENSE) for d
 Please look at the [contributing](CONTRIBUTING.md) document for further details.
 
 ## Credits
-This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess), the [Stockfish](https://github.com/official-stockfish/Stockfish) chess engine, [Pyodide](https://pyodide.org) for running Python in the browser, and [black](https://github.com/psf/black) for formatting.
+This project is dependent on the python-chess library [python-chess](https://github.com/niklasf/python-chess), the [Stockfish](https://github.com/official-stockfish/Stockfish) chess engine, [Pyodide](https://pyodide.org) for running Python in the browser, [wordle-words](https://github.com/seanpatlan/wordle-words) for the Wordle words, and [black](https://github.com/psf/black) for formatting.
 
 ## Contact
 Maintainer: RedPandaGuy1234
