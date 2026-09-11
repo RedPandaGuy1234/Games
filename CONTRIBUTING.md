@@ -17,4 +17,4 @@ Please include tests where applicable, follow the existing code style for whiche
 
 **WHEN YOU CONTRIBUTE A PR**
 
-Name the pull request starting with: "chore:" or nothing. If this is a PR to fix something, start with "fix:", if it is the start or continuation of an addition, start with "feat:", and lastly, if it is a major change (like finalizing a new addition), start with "feat!:" Also, if I have not approved your PR, please feel free to reach out and @mention me to do approve it.
+Name the pull request starting with: "chore:" or nothing. If this is a PR to fix something, start with "fix:", if it is the start or continuation of an addition, start with "feat:", and lastly, if it is a major change (like finalizing a new addition), start with "feat!:" Also, if I have not approved your PR, please feel free to reach out and @mention me to approve it.
