@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.2](https://github.com/RedPandaGuy1234/Games/compare/v1.3.1...v1.3.2) (2026-09-11)
+
+
+### Bug Fixes
+
+* Change random delay range from 1-60 to 1-30 seconds so people don't get bored ([9c21e1e](https://github.com/RedPandaGuy1234/Games/commit/9c21e1eae764da800f5e063666081a1f563a66e2))
+* Change reaction test wait time range ([70cf52b](https://github.com/RedPandaGuy1234/Games/commit/70cf52b507ec24e677bd8b19012bc75124f7eb69))
+
 ## [1.3.1](https://github.com/RedPandaGuy1234/Games/compare/v1.3.0...v1.3.1) (2026-09-11)
 
 
