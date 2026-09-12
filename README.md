@@ -12,6 +12,7 @@ A small collection of games, built by me, and hopefully you too. This repo start
   - [Number Guesser](#number-guesser)
   - [Chess](#chess)
   - [Reaction Test](#reaction-test)
+  - [Wordle](#Wordle)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Contributing](#contributing)
@@ -149,7 +150,7 @@ A quick game that measures how fast your reflexes are, in your terminal or your 
 
 ### Wordle
 
-Traditional Wordle, coming out soon, with no wait for the next day.
+Traditional Wordle, coming out soon, with no wait for the next day. 
 
 ## Requirements
 - **Browser versions (Battleship, The Questions, Number Guesser, Chess, Reaction Test):** any modern web browser. No installs required. First load fetches the Pyodide runtime (and, for Chess, the `python-chess` package), so an internet connection is needed at least once. The Questions has no Pyodide dependency and needs nothing beyond the browser itself.
@@ -157,7 +158,7 @@ Traditional Wordle, coming out soon, with no wait for the next day.
 - **Terminal Number Guesser:** Python 3 or newer, and a terminal
 - **Terminal Chess:** Python 3 or newer, and the `chess` package (see [Installation](#installation)). The [Stockfish](https://stockfishchess.org/download/) engine is only needed for Normal/Hard bot difficulty (see [Installing Stockfish](#installing-stockfish)); Easy mode needs nothing extra.
 - **Terminal Reaction Test:** Python 3 or newer, and a terminal
-- **Terminal Wordle:** Python 3 or newer, and a terminal
+- **Terminal Wordle:** Python 3 or newer, OpenSSL (see [Installing Stockfish and OpenSSL](#installing-stockfish-and-SSL), and a terminal
 
 ## Installation
 
