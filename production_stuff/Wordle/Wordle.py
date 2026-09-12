@@ -27,9 +27,14 @@ else:
     sys.exit(1)
 
 Word = Word_bank[random.randint(1, 2314)]
+Guess = "This is a filler!"
 
 def guess_word():
     guessed_word = input("Hello! Please enter your word, and use all lowercase.")
     if guessed_word not in Valid_Words:
         print("Sorry, but either you used an uppercase character, it is not in the Valid word bank (this is a limited word bank, and does not have every single five letter work in the world), or this is not a word. Please try again.")
         guess_word()
+    else:
+        return guessed_word
+
+Guess = guess_word()
