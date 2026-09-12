@@ -28,6 +28,7 @@ else:
 
 Word = Word_bank[random.randint(1, 2314)]
 Guess = "This is a filler!"
+guesses = 0
 
 def guess_word():
     guessed_word = input("Hello! Please enter your word, and use all lowercase.")
@@ -35,7 +36,11 @@ def guess_word():
         print("Sorry, but either you used an uppercase character, it is not in the Valid word bank (this is a limited word bank, and does not have every single five letter work in the world), you typed a space anywhere, it is not five letters, or this is not a word. Please try again.")
         guess_word()
     else:
-        return guessed_word
+        char_word_list = set(guessed_word)
+        return char_word_list
+
+def check_word(guesses, Guess):
+    
 
 Guess = guess_word()
 
