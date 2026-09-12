@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/RedPandaGuy1234/Games/compare/v1.6.0...v1.6.1) (2026-09-12)
+
+
+### Other
+
+* Revise Wordle section and installation details ([32c8393](https://github.com/RedPandaGuy1234/Games/commit/32c83931fc5778c9115a460ef0c676bc0f5d97b5))
+
 ## [1.6.0](https://github.com/RedPandaGuy1234/Games/compare/v1.5.0...v1.6.0) (2026-09-12)
 
 
