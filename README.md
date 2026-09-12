@@ -153,6 +153,7 @@ A quick game that measures how fast your reflexes are, in your terminal or your 
 - **Terminal Number Guesser:** Python 3 or newer, and a terminal
 - **Terminal Chess:** Python 3 or newer, and the `chess` package (see [Installation](#installation)). The [Stockfish](https://stockfishchess.org/download/) engine is only needed for Normal/Hard bot difficulty (see [Installing Stockfish](#installing-stockfish)); Easy mode needs nothing extra.
 - **Terminal Reaction Test:** Python 3 or newer, and a terminal
+- **Terminal Wordle:** Python 3 or newer, and a terminal
 
 ## Installation
 
