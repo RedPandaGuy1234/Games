@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/RedPandaGuy1234/Games/compare/v1.5.0...v1.6.0) (2026-09-12)
+
+
+### Features
+
+* Add 'other' type to release-please config ([c38512a](https://github.com/RedPandaGuy1234/Games/commit/c38512a2c0a93dfd3d697c2dcc9e40b1d638d396))
+
 ## [1.5.0](https://github.com/RedPandaGuy1234/Games/compare/v1.4.0...v1.5.0) (2026-09-12)
 
 
