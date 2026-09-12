@@ -2,6 +2,7 @@ import warnings
 warnings.filterwarnings('ignore', message='urllib3 v2 only supports OpenSSL')
 import requests
 import sys
+import random
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.NotOpenSSLWarning)
 
@@ -24,3 +25,8 @@ else:
     Word_bank = []
     print("This code has failed because the list for the word bank did not show up. Please alert RedPandaGuy1234 of this. Thank you!")
     sys.exit(1)
+
+Word = Word_bank[random.randint(1, 2314)]
+
+#This is a test
+print(Word)
