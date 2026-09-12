@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.5.0](https://github.com/RedPandaGuy1234/Games/compare/v1.4.0...v1.5.0) (2026-09-12)
+
+
+### Features
+
+* Update release-please configuration with changelog sections ([fc25008](https://github.com/RedPandaGuy1234/Games/commit/fc25008cb21b3a72a9169b037d1aa4af46b9ab97))
+
+
+### Bug Fixes
+
+* Update changelog section for continuations ([1dfbc7b](https://github.com/RedPandaGuy1234/Games/commit/1dfbc7b7d0602386d0d73037abd45ac057f95ed3))
+
+
+### Continuations
+
+* Clarify pull request naming guidelines ([fba8fc1](https://github.com/RedPandaGuy1234/Games/commit/fba8fc1cdfc61a2548d9d0637767028f827e52fb))
+
 ## [1.4.0](https://github.com/RedPandaGuy1234/Games/compare/v1.3.4...v1.4.0) (2026-09-12)
 
 
