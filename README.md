@@ -106,8 +106,8 @@ A chess game built on [python-chess](https://github.com/niklasf/python-chess) (a
 
 When you start the terminal game, you'll be asked whether you want to play against the bot, which color it should play (or Random), and which difficulty level (Easy, Normal, or Hard). **Only the terminal version needs Stockfish installed** — the browser version needs nothing extra. See [Installing Stockfish](#installing-stockfish) below if you want to play the terminal version's Normal or Hard mode.
 
-#### Installing Stockfish
-*(terminal Chess only — the browser version doesn't need this)*
+#### Installing Stockfish and OpenSSL
+*(terminal Chess and terminal Wordle only — the browser versions don't need this)*
 
 **macOS**
 
