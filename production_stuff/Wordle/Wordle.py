@@ -38,5 +38,4 @@ def guess_word():
         return guessed_word
 
 Guess = guess_word()
-#This is a test
-print(Guess)
+
