@@ -43,9 +43,7 @@ def guess_word(guesses):
             char_word_list = set(guessed_word)
             is_word_valid = True
             return char_word_list, guesses
-
-def check_word(guesses, Guess):
     
-    while is_guess_incorrect:
-        Guess, guesses = guess_word(guesses)
+while is_guess_incorrect:
+    Guess, guesses = guess_word(guesses)
 
