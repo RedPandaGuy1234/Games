@@ -32,15 +32,17 @@ guesses = 0
 is_guess_incorrect = True
 
 def guess_word(guesses):
+    is_word_valid = False
     guesses = guesses + 1
-    guessed_word = input("Hello! Please enter your word, and use all lowercase.")
-    if guessed_word not in Valid_Words:
-        print("Sorry, but either you used an uppercase character, it is not in the Valid word bank (this is a limited word bank, and does not have every single five letter work in the world), you typed a space anywhere, it is not five letters, or this is not a word. Please try again.")
-        guess_word(guesses)
-    else:
-        print("Ok!")
-        char_word_list = set(guessed_word)
-        return char_word_list, guesses
+    while not is_word_valid
+        guessed_word = input("Please enter your word, and use all lowercase.")
+        if guessed_word not in Valid_Words:
+            print("Sorry, but either you used an uppercase character, it is not in the Valid word bank (this is a limited word bank, and does not have every single five letter work in the world), you typed a space anywhere, it is not five letters, or this is not a word. Please try again.")
+        else:
+            print("Ok!")
+            char_word_list = set(guessed_word)
+            is_word_valid = True
+            return char_word_list, guesses
 
 def check_word(guesses, Guess):
     
