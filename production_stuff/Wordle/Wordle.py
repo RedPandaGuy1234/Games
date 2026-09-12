@@ -1,5 +1,7 @@
 import requests
 import sys
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.NotOpenSSLWarning)
 
 txt_url = "https://raw.githubusercontent.com/RedPandaGuy1234/Games/refs/heads/main/production_stuff/Wordle/Valid_Words.txt"
 response = requests.get(txt_url)
