@@ -184,7 +184,7 @@ A quick game that measures how fast your reflexes are, in your terminal or your 
 
 ### Wordle (Coming Soon)
 
-🚧 **Not yet playable.** Traditional Wordle is currently in development — the word list files (`Word_Bank.txt` and `Valid_Words.txt`) are in place under `production_stuff/Wordle/`, and word-fetching/validation logic has started, but the core guessing game and win/lose flow aren't implemented yet. There's no browser version planned to start, and the terminal version isn't ready to play. Check back soon!
+🚧 **Not yet playable.** Traditional Wordle is currently in development — the word list files (`Word_Bank.txt` and `Valid_Words.txt`) are in place under `production_stuff/Wordle/`, and word-fetching/validation logic has started, but the core guessing game and win/lose flow aren't implemented yet. There's no browser version planned to start, and the terminal version isn't ready to play. Check back soon, or help build it to make the process quicker!
 
 ## Requirements
 - **Browser versions (Battleship, The Questions, Number Guesser, Chess, Reaction Test):** any modern web browser. No installs required. First load fetches the Pyodide runtime (and, for Chess, the `python-chess` package), so an internet connection is needed at least once. The Questions has no Pyodide dependency and needs nothing beyond the browser itself.
