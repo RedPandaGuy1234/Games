@@ -44,6 +44,6 @@ def guess_word(guesses):
 
 def check_word(guesses, Guess):
     
-while not is_guess_correct:
-    Guess, guesses = guess_word(guesses)
+    while not is_guess_correct:
+        Guess, guesses = guess_word(guesses)
 
