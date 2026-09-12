@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.2](https://github.com/RedPandaGuy1234/Games/compare/v1.6.1...v1.6.2) (2026-09-12)
+
+
+### Continuations
+
+* Enhance guess validation error message ([5784a9f](https://github.com/RedPandaGuy1234/Games/commit/5784a9fcf64aa89695701c01a91b2f6f7938a3ab))
+
+
+### Other
+
+* Revise Wordle section for development encouragement ([89230cd](https://github.com/RedPandaGuy1234/Games/commit/89230cdaf1a5aba1d25f79747a84c22c5c564f55))
+
 ## [1.6.1](https://github.com/RedPandaGuy1234/Games/compare/v1.6.0...v1.6.1) (2026-09-12)
 
 
