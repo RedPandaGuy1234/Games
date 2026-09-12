@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.4.0](https://github.com/RedPandaGuy1234/Games/compare/v1.3.4...v1.4.0) (2026-09-12)
+
+
+### Features
+
+* Implement word bank retrieval from external source ([45347d9](https://github.com/RedPandaGuy1234/Games/commit/45347d99217f1db860af7adda3b9a2ae42b8f01d))
+* Implement word guessing and validation function ([74fa391](https://github.com/RedPandaGuy1234/Games/commit/74fa3910297c8330b37259466257b90e9bae7893))
+
+
+### Bug Fixes
+
+* Enhance input validation error message ([3d455b0](https://github.com/RedPandaGuy1234/Games/commit/3d455b08e6d343da763d44c98fda832f706c331d))
+* fix indentation error ([f83626f](https://github.com/RedPandaGuy1234/Games/commit/f83626f4bec214241c98d8332b5aa76dd88b3f1c))
+* Import urllib3 and disable SSL warnings ([d685800](https://github.com/RedPandaGuy1234/Games/commit/d685800301692645245af915620339540b7ed435))
+* Remove test print statement from Wordle.py ([6a7910f](https://github.com/RedPandaGuy1234/Games/commit/6a7910f3228c52b9142e3cab2bc1614e75640b58))
+* Suppress urllib3 OpenSSL warnings ([7b5116c](https://github.com/RedPandaGuy1234/Games/commit/7b5116c7f661f42ed3f6ea030c695694708d7b0a))
+
 ## [1.3.4](https://github.com/RedPandaGuy1234/Games/compare/v1.3.3...v1.3.4) (2026-09-11)
 
 
