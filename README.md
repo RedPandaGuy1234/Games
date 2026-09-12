@@ -147,6 +147,10 @@ A quick game that measures how fast your reflexes are, in your terminal or your 
     cd mainfile/Reactiontest
     python3 Reaction_test
 
+### Wordle
+
+Traditional Wordle, coming out soon, with no wait for the next day.
+
 ## Requirements
 - **Browser versions (Battleship, The Questions, Number Guesser, Chess, Reaction Test):** any modern web browser. No installs required. First load fetches the Pyodide runtime (and, for Chess, the `python-chess` package), so an internet connection is needed at least once. The Questions has no Pyodide dependency and needs nothing beyond the browser itself.
 - **Terminal Battleship:** Python 3 or newer, and a terminal
