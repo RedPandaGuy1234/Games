@@ -28,5 +28,3 @@ else:
 
 Word = Word_bank[random.randint(1, 2314)]
 
-#This is a test
-print(Word)
