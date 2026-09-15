@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.6.5](https://github.com/RedPandaGuy1234/Games/compare/v1.6.4...v1.6.5) (2026-09-15)
+
+
+### Bug Fixes
+
+* Simplify character checking in check_word ([b1e7cae](https://github.com/RedPandaGuy1234/Games/commit/b1e7cae83cb4316b61666a25ff5a0dc2755e51c7))
+
+
+### Continuations
+
+* Continue character checking logic in wordle.py ([e4ed13f](https://github.com/RedPandaGuy1234/Games/commit/e4ed13fa30d72f2132949fb104f5599eb75312fd))
+* Update check_word function to evaluate guesses ([d002aa0](https://github.com/RedPandaGuy1234/Games/commit/d002aa0d3a12c9231ac93b632d50153946e01f58))
+
 ## [1.6.4](https://github.com/RedPandaGuy1234/Games/compare/v1.6.3...v1.6.4) (2026-09-13)
 
 
